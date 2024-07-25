@@ -4,7 +4,7 @@
 #include "ConfigInterface.h"
 #include "RenderConfiguration.h"
 #include <optional>
-
+#include "VertexBuffer.h"
 #define LAYOUT 0
 #define VEC3SIZE 3
 #define STRIDE 9
@@ -53,6 +53,7 @@ namespace openGLTask {
 			int m_ScreenMaxWidth;
 			int m_ScreenMaxHeight;
 			GLFWwindow* m_pWindow=nullptr;
+			std::shared_ptr<CVertexBuffer> m_pVertex = nullptr;
 	};
 
 }

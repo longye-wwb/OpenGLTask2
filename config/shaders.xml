@@ -2,7 +2,6 @@
   <SHADER_SOURCE_FILE> .\\shaders\\vertPerpixelShading.glsl </SHADER_SOURCE_FILE>
 </SHADER>
 
-
 <SHADER> shader_perpixel_shading_fs
   <SHADER_SOURCE_FILE> .\\shaders\\fragPerpixelShading.glsl </SHADER_SOURCE_FILE>
 </SHADER>
