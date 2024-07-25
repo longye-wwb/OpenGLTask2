@@ -80,11 +80,12 @@ namespace openGLTask {
 			HIVE_LOG_ERROR("Window is not initialized!");
 			return;
 		}
+		if (m_pShader == nullptr) {
+			HIVE_LOG_ERROR("Shader is not initialized!");
+			return;
+		}
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
-
-		Shader LightingShader(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
-
-		unsigned int VBO, VAO, EBO;
+		
 		__setAndBindVertices();
 		VAO = m_pVertex->getVAO();
 		VBO = m_pVertex->getVBO();
@@ -106,11 +107,10 @@ namespace openGLTask {
 
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
-			LightingShader.setMat4("uProjection", ProjectionMat);
-			LightingShader.setMat4("uView", ViewMat);
-
+			m_pShader->setUniform("uProjection", ProjectionMat);
+			m_pShader->setUniform("uView", ViewMat);
 			glm::mat4 model = glm::mat4(1.0f);
-			LightingShader.setMat4("uModel", model);
+			m_pShader->setUniform("uModel", model);
 
 			m_pVertex->draw();
 
@@ -233,6 +233,7 @@ namespace openGLTask {
 			{
 				m_VertShaderPath = vVertShaderPath.value();
 				m_FragShaderPath = vFragShaderPath.value();
+				m_pShader = std::make_shared<CShader>(m_VertShaderPath, m_FragShaderPath);
 			}
 		}
 		else

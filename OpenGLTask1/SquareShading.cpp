@@ -5,7 +5,6 @@
 #include "shader_s.h"
 #include "HiveLogger.h"
 #include "RenderWindow.h"
-#include "RenderConfiguration.h"
 
 int main()
 {
