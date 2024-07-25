@@ -1,6 +1,7 @@
-#include "pch.h"
 #include "RenderConfiguration.h"
-namespace openGLTask {
+
+namespace openGLTask 
+{
 	CRenderConfiguration::CRenderConfiguration() {
 		_overwriteProductSig("MY_CONFIG");
 		__defineAttributesV();

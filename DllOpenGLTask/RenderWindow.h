@@ -1,12 +1,11 @@
 #pragma once
-#include "dllFile.h"
 #include "UtilityInterface.h"
 #include "ConfigInterface.h"
 #include "RenderConfiguration.h"
 #include "VertexBuffer.h"
 
-
-namespace openGLTask {
+namespace openGLTask 
+{
 	class OPENGLTASK_API CRenderWindow
 	{
 		public:
@@ -26,7 +25,6 @@ namespace openGLTask {
 			bool __init();
 			bool __readXML(CRenderConfiguration& vConfig, const std::string& vXMLName);
 			void __setAndBindVertices();
-			void __deleteBind(unsigned int& vVBO, unsigned int& vVAO, unsigned int& vEBO);
 			void __checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight);
 			void __checkAndSetWindowPos(std::optional<int> vPosX, std::optional<int> vPosY);
 			void __checkAndSetOpenGLVersion(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);

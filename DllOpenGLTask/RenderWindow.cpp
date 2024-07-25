@@ -2,14 +2,12 @@
 #include <vector>
 #include <optional>
 #include <filesystem>
-#include "RenderWindow.h"
 #include "shader_s.h"
-#include "VertexBuffer.h"
+#include "RenderWindow.h"
 
 namespace openGLTask {
-
-	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600),
-		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_WinName("GLFW_Window"),
+	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"),
+		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr),
 		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
@@ -47,12 +45,12 @@ namespace openGLTask {
 		if (!__init()) {
 			HIVE_LOG_ERROR("Can't read config file, use default settings.");
 		}
-
 		if (m_pWindow != nullptr)
 		{
 			HIVE_LOG_ERROR("Only one window can exist.");
 			return m_pWindow;
 		}
+
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, getMajorVersion());
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, getMinorVersion());
@@ -69,14 +67,12 @@ namespace openGLTask {
 		glfwSetWindowPos(m_pWindow, getPosX(), getPosY());
 		glfwSetFramebufferSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height) {
 			glViewport(0, 0, width, height); });
-
 		return m_pWindow;
 	}
 
 	void CRenderWindow::startRun()
 	{
 		GLFWwindow* m_pWindow = createWindow();
-		
 		if (m_pWindow == nullptr) {
 			HIVE_LOG_ERROR("Window is not initialized!");
 			return;
@@ -84,8 +80,6 @@ namespace openGLTask {
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
 
 		Shader LightingShader(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
-
-		unsigned int VBO, VAO, EBO;
 		__setAndBindVertices();
 
 		float angularSpeed = glm::radians(180.0f);
@@ -98,19 +92,17 @@ namespace openGLTask {
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			float angle = angularSpeed * static_cast<float>(glfwGetTime());
-			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-
 			LightingShader.use();
 			LightingShader.setVec3("uViewPos", CameraPos);
 			LightingShader.setFloat("uShininess", 32.0f);
 			LightingShader.setFloat("uAmbientStrength", 0.1f);
+			float angle = angularSpeed * static_cast<float>(glfwGetTime());
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
 			LightingShader.setVec3("uDirection", glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)));
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
 			LightingShader.setMat4("uProjection", ProjectionMat);
 			LightingShader.setMat4("uView", ViewMat);
-
 			glm::mat4 model = glm::mat4(1.0f);
 			LightingShader.setMat4("uModel", model);
 
@@ -118,11 +110,8 @@ namespace openGLTask {
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}
-
 		m_pVertexBuffer->deleteBuffer();
-
 		glfwTerminate();
-
 		return ;
 	}
 
@@ -348,12 +337,5 @@ namespace openGLTask {
 		};
 		
 		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, 4, Indices, GL_TRIANGLES, GL_STATIC_DRAW);
-	}
-	
-	void CRenderWindow::__deleteBind(unsigned int& vVBO, unsigned int& vVAO, unsigned int& vEBO)
-	{
-		glDeleteVertexArrays(1, &vVAO);
-		glDeleteBuffers(1, &vVBO);
-		glDeleteBuffers(1, &vEBO);
 	}
 }

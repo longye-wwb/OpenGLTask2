@@ -2,9 +2,6 @@
 #include <glad/glad.h>
 #include <vector>
 
-#define VEC3 3
-#define STRIDE 9
-
 namespace openGLTask {
 
 	class CVertexBuffer
