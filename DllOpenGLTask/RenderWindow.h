@@ -17,7 +17,7 @@ namespace openGLTask {
 			CRenderWindow();
 
 			GLFWwindow* createWindow();
-			void startRun(std::function<void()> vFuncTickOnceLoop);
+			void startRun();
 			int getWidth() { return m_Width; }
 			int getHeight() { return m_Height; }
 			int getPosX() { return m_PosX; }
@@ -41,7 +41,7 @@ namespace openGLTask {
 			void __setHeight(int vHeight) { m_Height = vHeight; }
 			void __setAndGetScreenSize();
 		
-			void __renderLoop(std::function<void()> vFuncTickOnceLoop);
+			void __renderLoop();
 			int m_MajorVersion;
 			int m_MinorVersion;
 			int m_Width;
