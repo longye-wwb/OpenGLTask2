@@ -88,33 +88,24 @@ namespace openGLTask {
 		unsigned int VBO, VAO, EBO;
 		__setAndBindVertices();
 
-		float deltaTime = 0.0f;	
-		float lastFrame = 0.0f;
-
+		float angularSpeed = glm::radians(180.0f);
 		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
 		
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
-			float currentFrame = static_cast<float>(glfwGetTime());
-			deltaTime = currentFrame - lastFrame;
-			lastFrame = currentFrame;
-
-			float angularSpeed = glm::radians(1.0f); 
-			float angle = angularSpeed * static_cast<float>(deltaTime); 
-
-			// 通过旋转矩阵计算新的光源方向
-			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::vec3(rotation * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			float angle = angularSpeed * static_cast<float>(glfwGetTime());
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
 
 			LightingShader.use();
 			LightingShader.setVec3("uViewPos", CameraPos);
 			LightingShader.setFloat("uShininess", 32.0f);
 			LightingShader.setFloat("uAmbientStrength", 0.1f);
-
+			LightingShader.setVec3("uDirection", glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)));
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
 			LightingShader.setMat4("uProjection", ProjectionMat);
