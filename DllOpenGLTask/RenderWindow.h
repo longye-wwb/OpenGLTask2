@@ -3,8 +3,8 @@
 #include "UtilityInterface.h"
 #include "ConfigInterface.h"
 #include "RenderConfiguration.h"
-#include <optional>
 #include "VertexBuffer.h"
+
 #define LAYOUT 0
 #define VEC3SIZE 3
 #define STRIDE 9
@@ -36,6 +36,7 @@ namespace openGLTask {
 			void __checkAndSetOpenGLVersion(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
 			void __checkAndSetWinName(const std::optional<std::string>& vWinName);
 			void __checkAndSetProfile(std::optional<bool> vUseCoreProfile);
+			void __checkAndSetShaderGLSL(std::optional<std::string> vVertShaderPath, std::optional<std::string> vFragShaderPath);
 			bool __isOpenGLVersionValid(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
 			void __setWidth(int vWidth) { m_Width = vWidth; }
 			void __setHeight(int vHeight) { m_Height = vHeight; }
@@ -49,10 +50,12 @@ namespace openGLTask {
 			int m_PosX;
 			int m_PosY;
 			std::string m_WinName;
+			std::string m_VertShaderPath;
+			std::string m_FragShaderPath;
 			bool m_UseCoreProfile;
 			int m_ScreenMaxWidth;
 			int m_ScreenMaxHeight;
-			GLFWwindow* m_pWindow=nullptr;
+			GLFWwindow* m_pWindow = nullptr;
 			std::shared_ptr<CVertexBuffer> m_pVertex = nullptr;
 	};
 

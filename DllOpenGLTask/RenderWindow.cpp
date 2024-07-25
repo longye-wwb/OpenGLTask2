@@ -1,14 +1,17 @@
 #include "pch.h"
+#include <vector>
+#include <optional>
+#include <filesystem>
 #include "RenderWindow.h"
 #include "shader_s.h"
 #include "VertexBuffer.h"
-#include <vector>
 
 namespace openGLTask {
 
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600),
-		m_PosX(0), m_PosY(0), m_UseCoreProfile(true), m_pWindow(nullptr), m_pVertex(nullptr),m_WinName("GLFW_Window"),
-		m_ScreenMaxWidth(1920),m_ScreenMaxHeight(1080)
+		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertex(nullptr), m_WinName("GLFW_Window"),
+		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
+		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
 	}
 
@@ -16,9 +19,9 @@ namespace openGLTask {
 	{
 		CRenderConfiguration Config;
 		if (!CRenderWindow::__readXML(Config, "./config/config.xml")) {
-			HIVE_LOG_ERROR("Can't Read Config,use default value");
 			return false;
 		}
+
 		std::optional<int> Width = Config.getAttribute<int>("Width");
 		std::optional<int> Height = Config.getAttribute<int>("Height");
 		std::optional<int> PosX = Config.getAttribute<int>("PosX");
@@ -27,31 +30,35 @@ namespace openGLTask {
 		std::optional<int> MinorVersion = Config.getAttribute<int>("MinorVersion");
 		std::optional<std::string> WinName = Config.getAttribute<std::string>("WinName");
 		std::optional<bool> UseCoreProfile = Config.getAttribute<bool>("UseCoreProfile");
+		std::optional<std::string> VertShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_vs|SHADER_SOURCE_FILE").value();
+		std::optional<std::string> FragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
+		
 		__setAndGetScreenSize();
 		__checkAndSetWindowSize(Width, Height);
 		__checkAndSetWindowPos(PosX, PosY);
 		__checkAndSetOpenGLVersion(MajorVersion, MinorVersion);
 		__checkAndSetWinName(WinName);
 		__checkAndSetProfile(UseCoreProfile);
+		__checkAndSetShaderGLSL(VertShaderPath, FragShaderPath);
 		return true;
 	}
 
 	GLFWwindow* CRenderWindow::createWindow() {
 		if (!__init()) {
-			HIVE_LOG_ERROR("Can't init properly");
+			HIVE_LOG_ERROR("Can't read config file, use default settings.");
 		}
-		if (m_pWindow!=nullptr)
+
+		if (m_pWindow != nullptr)
 		{
 			HIVE_LOG_ERROR("Only one window can exist.");
 			return m_pWindow;
 		}
-		//init()函数里执行了glfwinit()
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, getMajorVersion());
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, getMinorVersion());
-		glfwWindowHint(GLFW_OPENGL_PROFILE, getUseCoreProfile()? GLFW_OPENGL_CORE_PROFILE:GLFW_OPENGL_COMPAT_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, getUseCoreProfile() ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
 		
-		m_pWindow = glfwCreateWindow(getWidth(), getHeight(),getWinName().c_str(), nullptr, nullptr);
+		m_pWindow = glfwCreateWindow(getWidth(), getHeight(), getWinName().c_str(), nullptr, nullptr);
 		if (m_pWindow == nullptr)
 		{
 			HIVE_LOG_ERROR("Failed to create GLFW window");
@@ -75,7 +82,8 @@ namespace openGLTask {
 			return;
 		}
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
-		Shader LightingShader("directionLight.vs", "directionLight.fs");
+
+		Shader LightingShader(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
 
 		float Vertices[] = {
 			//Verices              Color             Normal
@@ -141,11 +149,9 @@ namespace openGLTask {
 			glfwPollEvents();
 		}
 
-
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
 		glDeleteBuffers(1, &EBO);
-
 
 		glfwTerminate();
 
@@ -159,7 +165,6 @@ namespace openGLTask {
 
 	bool CRenderWindow::__readXML(CRenderConfiguration& vConfig,const std::string& vXMLName)
 	{
-		//hiveUtility::hiveAddFileSearchPath("./");
 		CRenderConfiguration Config;
 		auto Status = hiveConfig::hiveParseConfig(vXMLName, hiveConfig::EConfigType::XML, &Config);
 		if (Status == hiveConfig::EParseResult::SUCCEED) {
@@ -253,6 +258,23 @@ namespace openGLTask {
 		}
 		return;
 	}
+
+	void CRenderWindow::__checkAndSetShaderGLSL(std::optional<std::string> vVertShaderPath, std::optional<std::string> vFragShaderPath)
+	{
+		if (vVertShaderPath.has_value() && vFragShaderPath.has_value())
+		{
+			if (std::filesystem::exists(vVertShaderPath.value()) && std::filesystem::exists(vFragShaderPath.value()))
+			{
+				m_VertShaderPath = vVertShaderPath.value();
+				m_FragShaderPath = vFragShaderPath.value();
+			}
+		}
+		else
+		{
+			HIVE_LOG_ERROR("ShaderGLSL paht is invalid, use default path.");
+		}
+		return;
+	}
 	
 	bool CRenderWindow::__isOpenGLVersionValid(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion) {
 		if (!vMajorVersion.has_value() || !vMinorVersion.has_value()) {
@@ -307,7 +329,6 @@ namespace openGLTask {
 	}
 
 	void CRenderWindow::__setAndGetScreenSize() {
-	
 		glfwInit();
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		if (monitor == nullptr) {
