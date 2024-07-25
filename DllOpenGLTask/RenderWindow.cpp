@@ -75,7 +75,7 @@ namespace openGLTask {
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
 		unsigned int VBO, VAO, EBO;
 		__setAndBindVertices(VBO, VAO, EBO);
-		__renderLoop(vFuncTickOnceLoop);
+		__renderLoop(vFuncTickOnceLoop, VAO);
 		__deleteBind(VBO, VAO, EBO);
 		glfwTerminate();
 		return ;
@@ -241,11 +241,16 @@ namespace openGLTask {
 		m_ScreenMaxHeight = mode->height;
 	}
 
-	void CRenderWindow::__renderLoop(std::function<void()> vFuncTickOnceLoop)
+	void CRenderWindow::__renderLoop(std::function<void()> vFuncTickOnceLoop, unsigned int& vVAO)
 	{
+		
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
-			if (vFuncTickOnceLoop != nullptr) vFuncTickOnceLoop();
+			if (vFuncTickOnceLoop != nullptr) {
+				vFuncTickOnceLoop();
+				glBindVertexArray(vVAO);
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			};
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}

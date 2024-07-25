@@ -15,6 +15,8 @@ namespace openGLTask {
 			const std::vector<unsigned int>& vIndices,
 			GLenum vDrawMode = GL_TRIANGLES
 		);
+		~CVertexBuffer();
+		void draw() const;
 	private:
 		GLuint m_VAO;
 		GLuint m_VBO;

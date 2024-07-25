@@ -11,12 +11,14 @@
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-
+void customRender();
+Shader LightingShader("../shaders/vertPerpixelShading.glsl", "../shaders/fragPerpixelShading.glsl");
 int main()
 {
     std::shared_ptr<openGLTask::CRenderWindow> pRenderWindow = std::make_shared<openGLTask::CRenderWindow>();
+    HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
     pRenderWindow->startRun(customRender);
+
 }
 
 void customRender() {
@@ -26,6 +28,7 @@ void customRender() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    
     LightingShader.use();
     LightingShader.setVec3("uViewPos", CameraPos);
     LightingShader.setFloat("uShininess", 32.0f);
@@ -39,6 +42,6 @@ void customRender() {
     glm::mat4 model = glm::mat4(1.0f);
     LightingShader.setMat4("uModel", model);
 
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    /*glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
 }

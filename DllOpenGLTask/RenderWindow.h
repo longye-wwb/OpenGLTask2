@@ -41,7 +41,7 @@ namespace openGLTask {
 			void __setHeight(int vHeight) { m_Height = vHeight; }
 			void __setAndGetScreenSize();
 		
-			void __renderLoop(std::function<void()> vFuncTickOnceLoop);
+			void __renderLoop(std::function<void()> vFuncTickOnceLoop, unsigned int& vVAO);
 			int m_MajorVersion;
 			int m_MinorVersion;
 			int m_Width;
