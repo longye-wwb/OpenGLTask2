@@ -11,7 +11,6 @@ namespace openGLTask
 	{
 		public:
 			CRenderWindow();
-
 			GLFWwindow* createWindow();
 			void startRun();
 			int getWidth() { return m_Width; }
@@ -37,8 +36,7 @@ namespace openGLTask
 			void __setWidth(int vWidth) { m_Width = vWidth; }
 			void __setHeight(int vHeight) { m_Height = vHeight; }
 			void __setAndGetScreenSize();
-		
-			void __renderLoop();
+
 			int m_MajorVersion;
 			int m_MinorVersion;
 			int m_Width;

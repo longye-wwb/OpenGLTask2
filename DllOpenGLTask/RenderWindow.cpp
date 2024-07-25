@@ -110,7 +110,6 @@ namespace openGLTask {
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}
-		m_pVertexBuffer->deleteBuffer();
 		glfwTerminate();
 		return ;
 	}
@@ -125,7 +124,27 @@ namespace openGLTask {
 		}
 		return false;
 	}
+	void CRenderWindow::__setAndBindVertices()
+	{
+		std::vector<float>Vertices = {
+			//Verices              Color             Normal
+			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
+			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
+			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
+			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
+		};
+		std::vector<unsigned int> Indices = {
+			0, 1, 3,
+			1, 2, 3
+		};
 
+		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices, std::vector<int>{3, 3, 3}, GL_TRIANGLES, GL_STATIC_DRAW);
+	}
+
+	void CRenderWindow::__setAndBindShader()
+	{
+		m_pShader = std::make_shared<Shader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
+	}
 	void CRenderWindow::__checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight)
 	{
 		
@@ -292,55 +311,4 @@ namespace openGLTask {
 		m_ScreenMaxHeight = mode->height;
 	}
 
-	void CRenderWindow::__renderLoop()
-	{
-	/*	glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-
-		while (!glfwWindowShouldClose(m_pWindow))
-		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			m_pShader->use();
-			m_pShader->setVec3("uViewPos", CameraPos);
-			m_pShader->setFloat("uShininess", 32.0f);
-			m_pShader->setFloat("uAmbientStrength", 0.1f);
-
-			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
-			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
-			m_pShader->setMat4("uProjection", ProjectionMat);
-			m_pShader->setMat4("uView", ViewMat);
-
-			glm::mat4 model = glm::mat4(1.0f);
-			m_pShader->setMat4("uModel", model);
-
-			glfwSwapBuffers(m_pWindow);
-			glfwPollEvents();
-		}*/
-
-	}
-
-	void CRenderWindow::__setAndBindVertices()
-	{
-		std::vector<float>Vertices = {
-			//Verices              Color             Normal
-			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
-			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
-			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-		};
-		std::vector<unsigned int> Indices={
-			0, 1, 3,
-			1, 2, 3
-		};
-		
-		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, 4, Indices, GL_TRIANGLES, GL_STATIC_DRAW);
-	}
-	
-	void CRenderWindow::__setAndBindShader()
-	{
-		m_pShader = std::make_shared<Shader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
-	}
 }
