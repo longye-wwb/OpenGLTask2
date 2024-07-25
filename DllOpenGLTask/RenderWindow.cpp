@@ -4,7 +4,6 @@
 #include <filesystem>
 #include "RenderWindow.h"
 #include "shader_s.h"
-#include "VertexBuffer.h"
 
 namespace openGLTask {
 
@@ -85,38 +84,11 @@ namespace openGLTask {
 
 		Shader LightingShader(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
 
-		float Vertices[] = {
-			//Verices              Color             Normal
-			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
-			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
-			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-		};
-		unsigned int Indices[] = {
-			0, 1, 3,
-			1, 2, 3
-		};
 		unsigned int VBO, VAO, EBO;
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
-
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		__setAndBindVertices();
+		VAO = m_pVertex->getVAO();
+		VBO = m_pVertex->getVBO();
+		EBO = m_pVertex->getEBO();
 
 		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -140,8 +112,7 @@ namespace openGLTask {
 			glm::mat4 model = glm::mat4(1.0f);
 			LightingShader.setMat4("uModel", model);
 
-			glBindVertexArray(VAO);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			m_pVertex->draw();
 
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
@@ -152,12 +123,9 @@ namespace openGLTask {
 		glDeleteBuffers(1, &EBO);
 
 		glfwTerminate();
-
-		/*unsigned int VBO, VAO, EBO;
-		__setAndBindVertices(VBO, VAO, EBO);
-		__renderLoop();
-		__deleteBind(VBO, VAO, EBO);
-		glfwTerminate();*/
+		
+		// __renderLoop();
+		// __deleteBind(VBO, VAO, EBO);
 		return ;
 	}
 
@@ -410,7 +378,7 @@ namespace openGLTask {
 		glDeleteBuffers(1, &EBO);
 	}
 
-	void CRenderWindow::__setAndBindVertices(unsigned int& vVBO, unsigned int& vVAO,unsigned int& vEBO)
+	void CRenderWindow::__setAndBindVertices()
 	{
 		std::vector<float>Vertices = {
 			//Verices              Color             Normal
@@ -424,7 +392,7 @@ namespace openGLTask {
 			1, 2, 3
 		};
 		
-		m_pVertex = std::make_shared<CVertexBuffer>(Vertices, 4, Indices);
+		m_pVertex = std::make_shared<CVertexArrayBuffer>(Vertices, Indices, std::vector<int>{3,3,3});
 	}
 	
 	void CRenderWindow::__deleteBind(unsigned int& vVBO, unsigned int& vVAO, unsigned int& vEBO)
