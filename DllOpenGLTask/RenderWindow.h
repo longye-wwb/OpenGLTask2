@@ -2,6 +2,7 @@
 #include "UtilityInterface.h"
 #include "ConfigInterface.h"
 #include "RenderConfiguration.h"
+#include "shader_s.h"
 #include "VertexBuffer.h"
 
 namespace openGLTask 
@@ -25,6 +26,7 @@ namespace openGLTask
 			bool __init();
 			bool __readXML(CRenderConfiguration& vConfig, const std::string& vXMLName);
 			void __setAndBindVertices();
+			void __setAndBindShader();
 			void __checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight);
 			void __checkAndSetWindowPos(std::optional<int> vPosX, std::optional<int> vPosY);
 			void __checkAndSetOpenGLVersion(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
@@ -51,6 +53,7 @@ namespace openGLTask
 			int m_ScreenMaxHeight;
 			GLFWwindow* m_pWindow = nullptr;
 			std::shared_ptr<CVertexBuffer> m_pVertexBuffer = nullptr;
+			std::shared_ptr<Shader> m_pShader = nullptr;
 	};
 
 }

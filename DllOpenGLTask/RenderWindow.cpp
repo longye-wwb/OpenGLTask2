@@ -2,12 +2,12 @@
 #include <vector>
 #include <optional>
 #include <filesystem>
-#include "shader_s.h"
 #include "RenderWindow.h"
 
 namespace openGLTask {
+
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"),
-		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr),
+		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr),
 		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
@@ -79,8 +79,8 @@ namespace openGLTask {
 		}
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
 
-		Shader LightingShader(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
 		__setAndBindVertices();
+		__setAndBindShader();
 
 		float angularSpeed = glm::radians(180.0f);
 		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -92,19 +92,19 @@ namespace openGLTask {
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			LightingShader.use();
-			LightingShader.setVec3("uViewPos", CameraPos);
-			LightingShader.setFloat("uShininess", 32.0f);
-			LightingShader.setFloat("uAmbientStrength", 0.1f);
+			m_pShader->use();
+			m_pShader->setVec3("uViewPos", CameraPos);
+			m_pShader->setFloat("uShininess", 32.0f);
+			m_pShader->setFloat("uAmbientStrength", 0.1f);
 			float angle = angularSpeed * static_cast<float>(glfwGetTime());
 			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-			LightingShader.setVec3("uDirection", glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)));
+			m_pShader->setVec3("uDirection", glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)));
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
-			LightingShader.setMat4("uProjection", ProjectionMat);
-			LightingShader.setMat4("uView", ViewMat);
+			m_pShader->setMat4("uProjection", ProjectionMat);
+			m_pShader->setMat4("uView", ViewMat);
 			glm::mat4 model = glm::mat4(1.0f);
-			LightingShader.setMat4("uModel", model);
+			m_pShader->setMat4("uModel", model);
 
 			m_pVertexBuffer->draw();
 			glfwSwapBuffers(m_pWindow);
@@ -303,18 +303,18 @@ namespace openGLTask {
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			LightingShader.use();
-			LightingShader.setVec3("uViewPos", CameraPos);
-			LightingShader.setFloat("uShininess", 32.0f);
-			LightingShader.setFloat("uAmbientStrength", 0.1f);
+			m_pShader->use();
+			m_pShader->setVec3("uViewPos", CameraPos);
+			m_pShader->setFloat("uShininess", 32.0f);
+			m_pShader->setFloat("uAmbientStrength", 0.1f);
 
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
-			LightingShader.setMat4("uProjection", ProjectionMat);
-			LightingShader.setMat4("uView", ViewMat);
+			m_pShader->setMat4("uProjection", ProjectionMat);
+			m_pShader->setMat4("uView", ViewMat);
 
 			glm::mat4 model = glm::mat4(1.0f);
-			LightingShader.setMat4("uModel", model);
+			m_pShader->setMat4("uModel", model);
 
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
@@ -337,5 +337,10 @@ namespace openGLTask {
 		};
 		
 		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, 4, Indices, GL_TRIANGLES, GL_STATIC_DRAW);
+	}
+	
+	void CRenderWindow::__setAndBindShader()
+	{
+		m_pShader = std::make_shared<Shader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
 	}
 }
