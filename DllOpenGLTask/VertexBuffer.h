@@ -1,6 +1,10 @@
 #pragma once
 #include <glad/glad.h>
 #include <vector>
+
+#define VEC3 3
+#define STRIDE 9
+
 namespace openGLTask {
 
 	class CVertexBuffer
@@ -21,8 +25,10 @@ namespace openGLTask {
 		);
 		~CVertexBuffer()=default;
 		void draw();
+	
 		GLuint getVAO() { return m_VAO; }
 	private:
+		void __configVertex();
 		GLuint m_VAO;
 		GLuint m_VBO;
 		GLuint m_EBO;

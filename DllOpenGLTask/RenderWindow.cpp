@@ -38,7 +38,7 @@ namespace openGLTask {
 
 	GLFWwindow* CRenderWindow::createWindow() {
 		if (!__init()) {
-			HIVE_LOG_ERROR("Can't Init");
+			HIVE_LOG_ERROR("Can't init properly");
 		}
 		if (m_pWindow!=nullptr)
 		{
@@ -46,6 +46,7 @@ namespace openGLTask {
 			return m_pWindow;
 		}
 		//init()函数里执行了glfwinit()
+		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, getMajorVersion());
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, getMinorVersion());
 		glfwWindowHint(GLFW_OPENGL_PROFILE, getUseCoreProfile()? GLFW_OPENGL_CORE_PROFILE:GLFW_OPENGL_COMPAT_PROFILE);
@@ -87,8 +88,10 @@ namespace openGLTask {
 			0, 1, 3,
 			1, 2, 3
 		};
+		
 		unsigned int VBO, VAO, EBO;
-		glGenVertexArrays(1, &VAO);
+		__setAndBindVertices(VBO, VAO, EBO);
+	/*	glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
 		glGenBuffers(1, &EBO);
 
@@ -107,7 +110,7 @@ namespace openGLTask {
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
 		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -133,7 +136,7 @@ namespace openGLTask {
 
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+			//m_pVertex->draw();
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}
@@ -308,6 +311,7 @@ namespace openGLTask {
 		glfwInit();
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		if (monitor == nullptr) {
+			HIVE_LOG_WARNING("Can't Get Monitor");
 			return;
 		}
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -402,7 +406,7 @@ namespace openGLTask {
 			1, 2, 3
 		};
 		
-		m_pVertex = std::make_shared<CVertexBuffer>(Vertices, 4, Indices);
+		m_pVertex = std::make_shared<CVertexBuffer>(Vertices, 4, Indices, GL_TRIANGLES, GL_STATIC_DRAW);
 	}
 	
 	void CRenderWindow::__deleteBind(unsigned int& vVBO, unsigned int& vVAO, unsigned int& vEBO)
