@@ -5,10 +5,6 @@
 #include "RenderConfiguration.h"
 #include "VertexBuffer.h"
 
-#define LAYOUT 0
-#define VEC3SIZE 3
-#define STRIDE 9
-#define OFFSET 0
 
 namespace openGLTask {
 	class OPENGLTASK_API CRenderWindow
@@ -56,7 +52,7 @@ namespace openGLTask {
 			int m_ScreenMaxWidth;
 			int m_ScreenMaxHeight;
 			GLFWwindow* m_pWindow = nullptr;
-			std::shared_ptr<CVertexBuffer> m_pVertex = nullptr;
+			std::shared_ptr<CVertexBuffer> m_pVertexBuffer = nullptr;
 	};
 
 }

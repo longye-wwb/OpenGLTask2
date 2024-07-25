@@ -40,6 +40,12 @@ namespace openGLTask {
 		if (m_EBO != 0) glDrawElements(m_DrawMode, m_VerticesCount, GL_UNSIGNED_INT, 0);
 		else glDrawArrays(m_DrawMode, 0, m_VerticesCol);
 	}
+	void CVertexBuffer::deleteBuffer()
+	{
+		glDeleteVertexArrays(1, &m_VAO);
+		glDeleteBuffers(1, &m_VBO);
+		glDeleteBuffers(1, &m_EBO);
+	}
 	void CVertexBuffer::__configVertex()
 	{
 		for (int i = 0; i <3; ++i)

@@ -25,7 +25,7 @@ namespace openGLTask {
 		);
 		~CVertexBuffer()=default;
 		void draw();
-	
+		void deleteBuffer();
 		GLuint getVAO() { return m_VAO; }
 	private:
 		void __configVertex();

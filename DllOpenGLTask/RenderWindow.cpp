@@ -9,7 +9,7 @@
 namespace openGLTask {
 
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600),
-		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertex(nullptr), m_WinName("GLFW_Window"),
+		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_WinName("GLFW_Window"),
 		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
@@ -88,12 +88,25 @@ namespace openGLTask {
 		unsigned int VBO, VAO, EBO;
 		__setAndBindVertices();
 
+		float deltaTime = 0.0f;	
+		float lastFrame = 0.0f;
+
 		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-
+		
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
+			float currentFrame = static_cast<float>(glfwGetTime());
+			deltaTime = currentFrame - lastFrame;
+			lastFrame = currentFrame;
+
+			float angularSpeed = glm::radians(1.0f); 
+			float angle = angularSpeed * static_cast<float>(deltaTime); 
+
+			// 通过旋转矩阵计算新的光源方向
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::vec3(rotation * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
@@ -110,14 +123,12 @@ namespace openGLTask {
 			glm::mat4 model = glm::mat4(1.0f);
 			LightingShader.setMat4("uModel", model);
 
-			m_pVertex->draw();
+			m_pVertexBuffer->draw();
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}
 
-		glDeleteVertexArrays(1, &VAO);
-		glDeleteBuffers(1, &VBO);
-		glDeleteBuffers(1, &EBO);
+		m_pVertexBuffer->deleteBuffer();
 
 		glfwTerminate();
 
@@ -345,7 +356,7 @@ namespace openGLTask {
 			1, 2, 3
 		};
 		
-		m_pVertex = std::make_shared<CVertexBuffer>(Vertices, 4, Indices, GL_TRIANGLES, GL_STATIC_DRAW);
+		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, 4, Indices, GL_TRIANGLES, GL_STATIC_DRAW);
 	}
 	
 	void CRenderWindow::__deleteBind(unsigned int& vVBO, unsigned int& vVAO, unsigned int& vEBO)
