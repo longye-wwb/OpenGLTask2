@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "RenderWindow.h"
 #include "shader_s.h"
+#include "VertexBuffer.h"
+#include <vector>
 
 namespace openGLTask {
 
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600),
-		m_PosX(0), m_PosY(0), m_UseCoreProfile(true), m_pWindow(nullptr), m_WinName("GLFW_Window"),
+		m_PosX(0), m_PosY(0), m_UseCoreProfile(true), m_pWindow(nullptr), m_pVertex(nullptr),m_WinName("GLFW_Window"),
 		m_ScreenMaxWidth(1920),m_ScreenMaxHeight(1080)
 	{
 	}
@@ -63,7 +65,7 @@ namespace openGLTask {
 		return m_pWindow;
 	}
 
-	void CRenderWindow::startRun(std::function<void()> vFuncTickOnceLoop)
+	void CRenderWindow::startRun()
 	{
 		GLFWwindow* m_pWindow = createWindow();
 		
@@ -71,12 +73,78 @@ namespace openGLTask {
 			HIVE_LOG_ERROR("Window is not initialized!");
 			return;
 		}
-
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
+		Shader LightingShader("directionLight.vs", "directionLight.fs");
+		float Vertices[] = {
+			//Verices              Color             Normal
+			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
+			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
+			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
+			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
+		};
+		std::cout << std::size(Vertices);
+		unsigned int Indices[] = {
+			0, 1, 3,
+			1, 2, 3
+		};
 		unsigned int VBO, VAO, EBO;
-		__setAndBindVertices(VBO, VAO, EBO);
-		__renderLoop(vFuncTickOnceLoop, VAO);
-		__deleteBind(VBO, VAO, EBO);
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+
+		while (!glfwWindowShouldClose(m_pWindow))
+		{
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			LightingShader.use();
+			LightingShader.setVec3("uViewPos", CameraPos);
+			LightingShader.setFloat("uShininess", 32.0f);
+			LightingShader.setFloat("uAmbientStrength", 0.1f);
+
+			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
+			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
+			LightingShader.setMat4("uProjection", ProjectionMat);
+			LightingShader.setMat4("uView", ViewMat);
+
+			glm::mat4 model = glm::mat4(1.0f);
+			LightingShader.setMat4("uModel", model);
+
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			glfwSwapBuffers(m_pWindow);
+			glfwPollEvents();
+		}
+
+
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &EBO);
+		//__setAndBindVertices(VBO, VAO, EBO);
+		//__renderLoop();
+		//__deleteBind(VBO, VAO, EBO);
 		glfwTerminate();
 		return ;
 	}
@@ -241,23 +309,10 @@ namespace openGLTask {
 		m_ScreenMaxHeight = mode->height;
 	}
 
-	void CRenderWindow::__renderLoop(std::function<void()> vFuncTickOnceLoop, unsigned int& vVAO)
+	void CRenderWindow::__renderLoop()
 	{
-		
-		while (!glfwWindowShouldClose(m_pWindow))
-		{
-			if (vFuncTickOnceLoop != nullptr) {
-				vFuncTickOnceLoop();
-				glBindVertexArray(vVAO);
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			};
-			glfwSwapBuffers(m_pWindow);
-			glfwPollEvents();
-		}
-	}
-
-	void CRenderWindow::__setAndBindVertices(unsigned int& vVBO, unsigned int& vVAO,unsigned int& vEBO)
-	{
+		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
+		Shader LightingShader("directionLight.vs", "directionLight.fs");
 		float Vertices[] = {
 			//Verices              Color             Normal
 			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
@@ -265,32 +320,83 @@ namespace openGLTask {
 			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
 			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
 		};
-
+		std::cout << std::size(Vertices);
 		unsigned int Indices[] = {
 			0, 1, 3,
 			1, 2, 3
 		};
-		
-		glGenVertexArrays(1, &vVAO);
-		glGenBuffers(1, &vVBO);
-		glGenBuffers(1, &vEBO);
+		unsigned int VBO, VAO, EBO;
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
 
-		glBindVertexArray(vVAO);
+		glBindVertexArray(VAO);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vEBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(LAYOUT, VEC3SIZE, GL_FLOAT, GL_FALSE, STRIDE*sizeof(float), (void*)OFFSET);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(LAYOUT+1, VEC3SIZE, GL_FLOAT, GL_FALSE, STRIDE*sizeof(float), (void*)(OFFSET+3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(LAYOUT+2, VEC3SIZE, GL_FLOAT, GL_FALSE, STRIDE*sizeof(float), (void*)(OFFSET+6 * sizeof(float)));
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+
+		while (!glfwWindowShouldClose(m_pWindow))
+		{
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			LightingShader.use();
+			LightingShader.setVec3("uViewPos", CameraPos);
+			LightingShader.setFloat("uShininess", 32.0f);
+			LightingShader.setFloat("uAmbientStrength", 0.1f);
+
+			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
+			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
+			LightingShader.setMat4("uProjection", ProjectionMat);
+			LightingShader.setMat4("uView", ViewMat);
+
+			glm::mat4 model = glm::mat4(1.0f);
+			LightingShader.setMat4("uModel", model);
+
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			glfwSwapBuffers(m_pWindow);
+			glfwPollEvents();
+		}
+
+
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &EBO);
+	}
+
+	void CRenderWindow::__setAndBindVertices(unsigned int& vVBO, unsigned int& vVAO,unsigned int& vEBO)
+	{
+		std::vector<float>Vertices = {
+			//Verices              Color             Normal
+			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
+			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
+			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
+			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
+		};
+		std::vector<unsigned int> Indices={
+			0, 1, 3,
+			1, 2, 3
+		};
+		
+		m_pVertex = std::make_shared<CVertexBuffer>(Vertices, 4, Indices);
 	}
 	
 	void CRenderWindow::__deleteBind(unsigned int& vVBO, unsigned int& vVAO, unsigned int& vEBO)
