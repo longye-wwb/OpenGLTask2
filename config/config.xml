@@ -21,3 +21,5 @@
     <FRAGMENT_SHADER> shader_perpixel_shading_fs </FRAGMENT_SHADER>
   </RENDER_PASS>
 </RENDER_ALGORITHM>
+
+<CameraPos> 0.0 0.0 3.0 </CameraPos>

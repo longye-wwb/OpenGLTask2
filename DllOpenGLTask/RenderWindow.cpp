@@ -13,7 +13,7 @@ namespace openGLTask {
 	{
 	}
 
-	bool CRenderWindow::__init()
+	bool CRenderWindow::__initParametersFromXML()
 	{
 		CRenderConfiguration Config;
 		if (!CRenderWindow::__readXML(Config, "./config/config.xml")) {
@@ -31,6 +31,11 @@ namespace openGLTask {
 		std::optional<std::string> VertShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_vs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> FragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
 		
+		std::optional<std::tuple<float, float, float>> CamPos = Config.getAttribute<std::tuple<double, double, double>>("CameraPos");
+		if (CamPos.has_value())
+			std::cout << std::get<0>(CamPos.value()) << " " << std::get<1>(CamPos.value()) << " " << std::get<2>(CamPos.value()) << " " << std::endl;
+		else
+			std::cout << "no value" << std::endl;
 		__setAndGetScreenSize();
 		__checkAndSetWindowSize(Width, Height);
 		__checkAndSetWindowPos(PosX, PosY);
@@ -42,7 +47,7 @@ namespace openGLTask {
 	}
 
 	GLFWwindow* CRenderWindow::createWindow() {
-		if (!__init()) {
+		if (!__initParametersFromXML()) {
 			HIVE_LOG_ERROR("Can't read config file, use default settings.");
 		}
 		if (m_pWindow != nullptr)
@@ -124,6 +129,7 @@ namespace openGLTask {
 		}
 		return false;
 	}
+	
 	void CRenderWindow::__setAndBindVertices()
 	{
 		std::vector<float>Vertices = {
@@ -145,6 +151,7 @@ namespace openGLTask {
 	{
 		m_pShader = std::make_shared<Shader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
 	}
+
 	void CRenderWindow::__checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight)
 	{
 		

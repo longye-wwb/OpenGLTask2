@@ -1,4 +1,4 @@
-#version 330 core
+#version 460 core
 out vec4 FragColor;
 
 in vec3 vFragPos;  
@@ -9,6 +9,7 @@ uniform vec3 uViewPos;
 uniform float uShininess;
 uniform float uAmbientStrength;
 uniform vec3 uDirection;
+
 void main()
 {
     vec3 lightColor=vec3(1.0f, 1.0f, 1.0f);
@@ -18,9 +19,7 @@ void main()
   	
     // diffuse 
     vec3 norm = normalize(vNormal);
-    // 平行光不需要计算物体和光源的位置
     vec3 lightDir = normalize(-uDirection);  
-
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = lightColor * diff;
     

@@ -6,6 +6,15 @@ namespace openGLTask {
 
 	class CVertexBuffer
 	{
+	private:
+		GLuint m_VAO;
+		GLuint m_VBO;
+		GLuint m_EBO;
+		GLuint m_VerticesCount;
+		GLenum m_DrawMode;
+
+		void __configVertex(const std::vector<int>& vVertexIndex);
+
 	public:
 		CVertexBuffer(
 			const std::vector<float>& vVertices,
@@ -21,14 +30,8 @@ namespace openGLTask {
 			GLenum vUsage = GL_STATIC_DRAW
 		);
 		~CVertexBuffer();
+
 		void draw();
-	private:
-		void __configVertex(const std::vector<int>& vVertexIndex);
-		GLuint m_VAO;
-		GLuint m_VBO;
-		GLuint m_EBO;
-		GLuint m_VerticesCount;
-		GLenum m_DrawMode;
 	};
 }
 

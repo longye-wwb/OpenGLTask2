@@ -17,13 +17,14 @@ namespace openGLTask
 		_defineAttribute("PosY", hiveConfig::EConfigDataType::ATTRIBUTE_INT);
 		_defineAttribute("WinName", hiveConfig::EConfigDataType::ATTRIBUTE_STRING);
 		_defineAttribute("UseCoreProfile", hiveConfig::EConfigDataType::ATTRIBUTE_BOOL);
-
+		
 		_defineAttribute("SHADER",hiveConfig::EConfigDataType::ATTRIBUTE_SUBCONFIG);
 		_defineAttribute("SHADER_SOURCE_FILE", hiveConfig::EConfigDataType::ATTRIBUTE_STRING);
 		_defineAttribute("RENDER_ALGORITHM", hiveConfig::EConfigDataType::ATTRIBUTE_SUBCONFIG);
 		_defineAttribute("RENDER_PASS", hiveConfig::EConfigDataType::ATTRIBUTE_SUBCONFIG);
 		_defineAttribute("VERTEX_SHADER", hiveConfig::EConfigDataType::ATTRIBUTE_STRING);
 		_defineAttribute("FRAGMENT_SHADER", hiveConfig::EConfigDataType::ATTRIBUTE_STRING);
+		_defineAttribute("CameraPos", hiveConfig::EConfigDataType::ATTRIBUTE_VEC3F);
 	}
 
 	void CRenderConfiguration::__loadDefaultConfigV()
@@ -36,6 +37,7 @@ namespace openGLTask
 		setAttribute("PosY",0);
 		setAttribute("WinName",std::string("Learn_OpenGL"));
 		setAttribute("UseCoreProfile",true);
+		setAttribute("CameraPos",(0.0f, 0.0f, 1.0f));
 	}
 }
 
