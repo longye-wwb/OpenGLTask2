@@ -11,9 +11,7 @@ int main()
 {
     std::shared_ptr<openGLTask::CRenderWindow> pRenderWindow = std::make_shared<openGLTask::CRenderWindow>();
     pRenderWindow->startRun();
-}    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
+}   
 //void customRender() {
 //    glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 //    glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);

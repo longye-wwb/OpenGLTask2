@@ -7,7 +7,7 @@ namespace openGLTask {
 	public:
 		CRenderConfiguration();
 		~CRenderConfiguration() = default;
-		virtual	void __defineAttributesV();
-		virtual	void __loadDefaultConfigV();
+		void __defineAttributesV();
+		void __loadDefaultConfigV();
 	};
 }

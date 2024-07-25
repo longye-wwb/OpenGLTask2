@@ -149,7 +149,6 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderConfiguration.h" />
     <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="ShaderConfiguration.h" />
     <ClInclude Include="shader_s.h" />
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
@@ -163,7 +162,6 @@
     </ClCompile>
     <ClCompile Include="RenderConfiguration.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
-    <ClCompile Include="ShaderConfiguration.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
