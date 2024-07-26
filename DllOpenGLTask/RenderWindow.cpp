@@ -283,6 +283,10 @@ namespace openGLTask {
 				m_VertShaderPath = vVertShaderPath.value();
 				m_FragShaderPath = vFragShaderPath.value();
 			}
+			else
+			{
+				HIVE_LOG_ERROR("ShaderGLSL paht is invalid, use default path.");
+			}
 		}
 		else
 		{

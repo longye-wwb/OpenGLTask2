@@ -7,6 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLTask1", "OpenGLTask1\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DllOpenGLTask", "DllOpenGLTask\DllOpenGLTask.vcxproj", "{1FEB796B-A920-42BE-913B-00149880589B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLTaskTestWindow", "OpenGLTaskTestWindow\OpenGLTaskTestWindow.vcxproj", "{49E30DA4-D940-4466-AEB1-A6182261D29C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTest", "UnitTest", "{AAE5A410-9E99-4447-A976-6C93F073453A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,9 +35,20 @@ Global
 		{1FEB796B-A920-42BE-913B-00149880589B}.Release|x64.Build.0 = Release|x64
 		{1FEB796B-A920-42BE-913B-00149880589B}.Release|x86.ActiveCfg = Release|Win32
 		{1FEB796B-A920-42BE-913B-00149880589B}.Release|x86.Build.0 = Release|Win32
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Debug|x64.ActiveCfg = Debug|x64
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Debug|x64.Build.0 = Debug|x64
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Debug|x86.ActiveCfg = Debug|Win32
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Debug|x86.Build.0 = Debug|Win32
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Release|x64.ActiveCfg = Release|x64
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Release|x64.Build.0 = Release|x64
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Release|x86.ActiveCfg = Release|Win32
+		{49E30DA4-D940-4466-AEB1-A6182261D29C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{49E30DA4-D940-4466-AEB1-A6182261D29C} = {AAE5A410-9E99-4447-A976-6C93F073453A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DE662BE9-56BE-49F5-A8A2-8B2B19475B54}
