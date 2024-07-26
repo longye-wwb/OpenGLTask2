@@ -148,6 +148,7 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="dllFile.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="InputController.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="pch.h" />

@@ -2,6 +2,7 @@
 #include "UtilityInterface.h"
 #include "ConfigInterface.h"
 #include "RenderConfiguration.h"
+#include "DirectionalLight.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "VertexBuffer.h"
@@ -28,6 +29,7 @@ namespace openGLTask
 		std::shared_ptr<CVertexBuffer> m_pVertexBuffer = nullptr;
 		std::shared_ptr<CShader> m_pShader = nullptr;
 		std::shared_ptr<CCamera> m_pCamera = nullptr;
+		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
 
 		GLFWwindow* __createWindow();
 		bool __initParametersFromXML();
@@ -50,7 +52,7 @@ namespace openGLTask
 	public:
 		CRenderWindow();
 
-		void startRun();
+		void startRun(std::function<glm::vec3(std::shared_ptr<openGLTask::CDirectionalLight>)> vFunCallback);
 		int getWidth() { return m_Width; }
 		int getHeight() { return m_Height; }
 		int getPosX() { return m_PosX; }
