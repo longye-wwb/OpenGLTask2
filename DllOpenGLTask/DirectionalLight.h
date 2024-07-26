@@ -1,6 +1,7 @@
 #pragma once
 #include "Light.h"
-namespace openGLTask {
+namespace openGLTask 
+{
 	class CDirectionalLight:public CLight
 	{
 	private:

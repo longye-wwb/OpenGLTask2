@@ -1,5 +1,6 @@
 #pragma once
-namespace openGLTask {
+namespace openGLTask 
+{
 	class CMaterial
 	{
 		virtual void init() const = 0;

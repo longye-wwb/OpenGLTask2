@@ -1,7 +1,8 @@
 #include "DirectionalLight.h"
 #include "pch.h"
 
-namespace openGLTask {
+namespace openGLTask 
+{
 	CDirectionalLight::CDirectionalLight()
 	:m_LightColor(glm::vec3(1.0f, 1.0f, 1.0f)),m_LightDirection(0.0f,0.0f,- 1.0f),m_LightPosition(0.0f,0.0f,0.0f)
 	{
