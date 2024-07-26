@@ -89,10 +89,6 @@ namespace openGLTask {
 		__setAndBindVertices();
 		__setAndBindShader();
 
-		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -102,16 +98,16 @@ namespace openGLTask {
 			m_pShader->setVec3("uViewPos", m_pCamera->getWorldPos());
 			m_pShader->setFloat("uShininess", 32.0f);
 			m_pShader->setFloat("uAmbientStrength", 0.1f);
-			float angularSpeed = glm::radians(180.0f);
-			float angle = angularSpeed * static_cast<float>(glfwGetTime());
-			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-			m_pShader->setVec3("uDirection", glm::vec3(rotation * glm::vec4(m_LightDirection, 0.0f)));
+			float AngularSpeed = glm::radians(180.0f);
+			float Angle = AngularSpeed * static_cast<float>(glfwGetTime());
+			glm::mat4 Rotation = glm::rotate(glm::mat4(1.0f), Angle, glm::vec3(0.0f, 1.0f, 0.0f));
+			m_pShader->setVec3("uDirection", glm::vec3(Rotation * glm::vec4(m_LightDirection, 0.0f)));
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
 			m_pShader->setMat4("uProjection", ProjectionMat);
 			m_pShader->setMat4("uView", ViewMat);
-			glm::mat4 model = glm::mat4(1.0f);
-			m_pShader->setMat4("uModel", model);
+			glm::mat4 Model = glm::mat4(1.0f);
+			m_pShader->setMat4("uModel", Model);
 
 			m_pVertexBuffer->draw();
 			glfwSwapBuffers(m_pWindow);
@@ -300,12 +296,12 @@ namespace openGLTask {
 			return false;
 		}
 
-		int major = vMajorVersion.value();
-		int minor = vMinorVersion.value();
+		int Major = vMajorVersion.value();
+		int Minor = vMinorVersion.value();
 
-		switch (major) {
+		switch (Major) {
 		case 1:
-			switch (minor) {
+			switch (Minor) {
 			case 0:
 			case 1:
 				return true;
@@ -313,7 +309,7 @@ namespace openGLTask {
 				return false;
 			}
 		case 2:
-			switch (minor) {
+			switch (Minor) {
 			case 0:
 			case 1:
 				return true;
@@ -321,7 +317,7 @@ namespace openGLTask {
 				return false;
 			}
 		case 3:
-			switch (minor) {
+			switch (Minor) {
 			case 0:
 			case 1:
 			case 2:
@@ -331,7 +327,7 @@ namespace openGLTask {
 				return false;
 			}
 		case 4:
-			switch (minor) {
+			switch (Minor) {
 			case 0:
 			case 1:
 			case 2:
@@ -349,14 +345,14 @@ namespace openGLTask {
 
 	void CRenderWindow::__setAndGetScreenSize() {
 		glfwInit();
-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-		if (monitor == nullptr) {
+		GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
+		if (pMonitor == nullptr) {
 			HIVE_LOG_WARNING("Can't Get Monitor");
 			return;
 		}
-		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		m_ScreenMaxWidth = mode->width;
-		m_ScreenMaxHeight = mode->height;
+		const GLFWvidmode* pMode = glfwGetVideoMode(pMonitor);
+		m_ScreenMaxWidth = pMode->width;
+		m_ScreenMaxHeight = pMode->height;
 	}
 
 }
