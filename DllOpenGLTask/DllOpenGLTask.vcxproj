@@ -149,10 +149,12 @@
     <ClInclude Include="dllFile.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderConfiguration.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="simpleMaterial.h" />
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +170,7 @@
     <ClCompile Include="RenderConfiguration.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="simpleMaterial.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>

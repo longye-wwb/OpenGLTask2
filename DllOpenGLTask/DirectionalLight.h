@@ -3,13 +3,20 @@
 namespace openGLTask {
 	class CDirectionalLight:public CLight
 	{
+	private:
+		glm::vec3 m_LightColor;
+		glm::vec3 m_LightPosition;
+		glm::vec3 m_LightDirection;
 	public:
-		glm::vec3 getLightColor() const override;
-		glm::vec3 getPosition() const override;
-		glm::vec3 getDirection() const override;
-		glm::vec3 setLightColor(const glm::vec3& vColor) const override;
-		glm::vec3 setPosition(const glm::vec3& vPosition) const override;
-		glm::vec3 setDirection(const glm::vec3& vDirection) const override;
+		CDirectionalLight();
+
+		glm::vec3 getLightColor() const override { return m_LightColor; }
+		glm::vec3 getPosition() const override { return m_LightPosition; }
+		glm::vec3 getDirection() const override { return m_LightDirection; }
+		void setLightColor(const glm::vec3& vColor) override { m_LightColor = vColor; }
+		void setPosition(const glm::vec3& vPosition) override { m_LightPosition = vPosition; }
+		void setDirection(const glm::vec3& vDirection)  override { m_LightDirection = vDirection; }
+		glm::vec3 rotateLight(const float& vSpeed);
 	};
 }
 

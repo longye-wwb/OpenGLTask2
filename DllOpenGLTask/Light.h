@@ -7,9 +7,9 @@ namespace openGLTask {
 		virtual glm::vec3 getLightColor() const = 0;
 		virtual glm::vec3 getPosition() const = 0;
 		virtual glm::vec3 getDirection() const = 0;
-		virtual glm::vec3 setLightColor(const glm::vec3& vColor) const = 0;
-		virtual glm::vec3 setPosition(const glm::vec3& vPosition) const = 0;
-		virtual glm::vec3 setDirection(const glm::vec3& vDirection) const = 0;
+		virtual void setLightColor(const glm::vec3& vColor) = 0;
+		virtual void setPosition(const glm::vec3& vPosition) = 0;
+		virtual void setDirection(const glm::vec3& vDirection) = 0;
 	};
 }
 
