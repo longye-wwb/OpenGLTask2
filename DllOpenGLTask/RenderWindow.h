@@ -29,6 +29,7 @@ namespace openGLTask
 		std::shared_ptr<CShader> m_pShader = nullptr;
 		std::shared_ptr<CCamera> m_pCamera = nullptr;
 
+		GLFWwindow* __createWindow();
 		bool __initParametersFromXML();
 		bool __readXML(CRenderConfiguration& vConfig, const std::string& vXMLName);
 		void __setAndBindVertices();
@@ -49,7 +50,6 @@ namespace openGLTask
 	public:
 		CRenderWindow();
 
-		GLFWwindow* createWindow();
 		void startRun();
 		int getWidth() { return m_Width; }
 		int getHeight() { return m_Height; }

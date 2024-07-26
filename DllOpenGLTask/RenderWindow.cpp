@@ -48,7 +48,7 @@ namespace openGLTask {
 		return true;
 	}
 
-	GLFWwindow* CRenderWindow::createWindow() {
+	GLFWwindow* CRenderWindow::__createWindow() {
 		if (!__initParametersFromXML()) {
 			HIVE_LOG_ERROR("Can't read config file, use default settings.");
 		}
@@ -79,7 +79,7 @@ namespace openGLTask {
 
 	void CRenderWindow::startRun()
 	{
-		GLFWwindow* m_pWindow = createWindow();
+		GLFWwindow* m_pWindow = __createWindow();
 		if (m_pWindow == nullptr) {
 			HIVE_LOG_ERROR("Window is not initialized!");
 			return;
