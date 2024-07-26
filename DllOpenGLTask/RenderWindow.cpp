@@ -232,7 +232,7 @@ namespace openGLTask {
 		}
 		else
 		{
-			HIVE_LOG_ERROR("CoreProfileMode is invalid,use default value");
+			HIVE_LOG_ERROR("CoreProfileMode is invalid, use default value");
 		}
 		return;
 	}
