@@ -15,22 +15,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shader_s.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="SquareShading.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="directionLight.vs">
-      <Filter>源文件</Filter>
-    </None>
-    <None Include="directionLight.fs">
-      <Filter>源文件</Filter>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
 </Project>

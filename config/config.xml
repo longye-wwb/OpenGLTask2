@@ -2,7 +2,7 @@
 <Height>600</Height>
 <MajorVersion> 3 </MajorVersion>
 <MinorVersion> 3 </MinorVersion>
-<PosX> 1000 </PosX>
+<PosX> 100 </PosX>
 <PosY> 100 </PosY>
 <WinName> hello world </WinName>
 <UseCoreProfile> true </UseCoreProfile>

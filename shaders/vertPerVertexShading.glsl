@@ -20,7 +20,7 @@ void main()
     gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
     vec3 ObjColor = aColor;
 
-    vec3 lightColor=vec3(1.0f, 1.0f, 1.0f);
+    vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
     // ambient
     vec3 ambient = uAmbientStrength * lightColor;
   	
@@ -37,5 +37,4 @@ void main()
     vec3 specular =  spec * lightColor;
         
     vLightingColor = (ambient + diffuse + specular)*ObjColor;
-
 }
