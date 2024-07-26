@@ -6,8 +6,8 @@
 
 namespace openGLTask {
 
-	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"),
-		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr),
+	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"), m_LightDirection(glm::vec3(0.0f, 0.0f, 1.0f)),
+		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr),
 		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
@@ -31,11 +31,11 @@ namespace openGLTask {
 		std::optional<std::string> VertShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_vs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> FragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
 		
-		std::optional<std::tuple<float, float, float>> CamPos = Config.getAttribute<std::tuple<double, double, double>>("CameraPos");
-		if (CamPos.has_value())
-			std::cout << std::get<0>(CamPos.value()) << " " << std::get<1>(CamPos.value()) << " " << std::get<2>(CamPos.value()) << " " << std::endl;
-		else
-			std::cout << "no value" << std::endl;
+		std::optional<std::tuple<double, double, double>> CamPos = Config.getAttribute<std::tuple<double, double, double>>("CameraPos");
+		std::optional<std::tuple<double, double, double>> CameraFront = Config.getAttribute<std::tuple<double, double, double>>("CameraFront");
+		std::optional<std::tuple<double, double, double>> CameraUp = Config.getAttribute<std::tuple<double, double, double>>("CameraUp");
+		std::optional<std::tuple<double, double, double>> LightDirection = Config.getAttribute<std::tuple<double, double, double>>("LightDirection");
+		
 		__setAndGetScreenSize();
 		__checkAndSetWindowSize(Width, Height);
 		__checkAndSetWindowPos(PosX, PosY);
@@ -43,6 +43,8 @@ namespace openGLTask {
 		__checkAndSetWinName(WinName);
 		__checkAndSetProfile(UseCoreProfile);
 		__checkAndSetShaderGLSL(VertShaderPath, FragShaderPath);
+		__checkAndBindCamera(CamPos, CameraFront, CameraUp);
+		__checkAndSetLightDirection(LightDirection);
 		return true;
 	}
 
@@ -87,25 +89,25 @@ namespace openGLTask {
 		__setAndBindVertices();
 		__setAndBindShader();
 
-		float angularSpeed = glm::radians(180.0f);
 		glm::vec3 CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 		glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-		
+
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			m_pShader->use();
-			m_pShader->setVec3("uViewPos", CameraPos);
+			m_pShader->setVec3("uViewPos", m_pCamera->getWorldPos());
 			m_pShader->setFloat("uShininess", 32.0f);
 			m_pShader->setFloat("uAmbientStrength", 0.1f);
+			float angularSpeed = glm::radians(180.0f);
 			float angle = angularSpeed * static_cast<float>(glfwGetTime());
 			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-			m_pShader->setVec3("uDirection", glm::vec3(rotation * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)));
+			m_pShader->setVec3("uDirection", glm::vec3(rotation * glm::vec4(m_LightDirection, 0.0f)));
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
-			glm::mat4 ViewMat = glm::lookAt(CameraPos, CameraPos + Front, Up);
+			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
 			m_pShader->setMat4("uProjection", ProjectionMat);
 			m_pShader->setMat4("uView", ViewMat);
 			glm::mat4 model = glm::mat4(1.0f);
@@ -115,6 +117,7 @@ namespace openGLTask {
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}
+
 		glfwTerminate();
 		return ;
 	}
@@ -123,11 +126,21 @@ namespace openGLTask {
 	{
 		CRenderConfiguration Config;
 		auto Status = hiveConfig::hiveParseConfig(vXMLName, hiveConfig::EConfigType::XML, &Config);
-		if (Status == hiveConfig::EParseResult::SUCCEED) {
+		if (Status == hiveConfig::EParseResult::SUCCEED) 
+		{
 			vConfig = Config;
 			return true;
 		}
-		return false;
+		else if (Status == hiveConfig::EParseResult::SKIP_SOME_ITEMS)
+		{
+			vConfig = Config;
+			HIVE_LOG_WARNING("Warning : Some items in XML are not set correctly!");
+			return true;
+		}
+		else if (Status == hiveConfig::EParseResult::FAIL)
+		{
+			return false;
+		}
 	}
 	
 	void CRenderWindow::__setAndBindVertices()
@@ -149,7 +162,35 @@ namespace openGLTask {
 
 	void CRenderWindow::__setAndBindShader()
 	{
-		m_pShader = std::make_shared<Shader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
+		m_pShader = std::make_shared<CShader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
+	}
+
+	void CRenderWindow::__checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp)
+	{
+		m_pCamera = std::make_shared<CCamera>();
+		if (vCameraPos.has_value())
+		{
+			glm::vec3 CameraPos = glm::vec3((float)std::get<0>(vCameraPos.value()), (float)std::get<1>(vCameraPos.value()), (float)std::get<2>(vCameraPos.value()));
+			m_pCamera->setWorldPos(CameraPos);
+		}
+		if (vCameraFront.has_value())
+		{
+			glm::vec3 CameraFront = glm::vec3((float)std::get<0>(vCameraFront.value()), (float)std::get<1>(vCameraFront.value()), (float)std::get<2>(vCameraFront.value()));
+			m_pCamera->setFront(CameraFront);
+		}
+		if (vCameraUp.has_value())
+		{
+			glm::vec3 CameraUp = glm::vec3(std::get<0>(vCameraUp.value()), std::get<1>(vCameraUp.value()), std::get<2>(vCameraUp.value()));
+			m_pCamera->setWorldUp(CameraUp);
+		}
+	}
+
+	void CRenderWindow::__checkAndSetLightDirection(std::optional<std::tuple<double, double, double>> vLightDirection)
+	{
+		if (vLightDirection.has_value())
+		{
+			m_LightDirection = glm::vec3(std::get<0>(vLightDirection.value()), std::get<1>(vLightDirection.value()), std::get<2>(vLightDirection.value()));
+		}
 	}
 
 	void CRenderWindow::__checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight)

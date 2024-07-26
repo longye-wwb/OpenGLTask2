@@ -1,8 +1,11 @@
+#include <fstream>
+#include <sstream>
+#include <iostream>
 #include "Shader.h"
 
 namespace openGLTask
 {
-    Shader::Shader(const char* vVertexPath, const char* vFragmentPath)
+    CShader::CShader(const char* vVertexPath, const char* vFragmentPath)
     {
         std::string VertexCode;
         std::string FragmentCode;
@@ -29,7 +32,7 @@ namespace openGLTask
         }
         catch (std::ifstream::failure& e)
         {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+            std::cout << "ERROR::CShader::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
         }
         const char* ShaderCodeVertex = VertexCode.c_str();
         const char* ShaderCodeFragment = FragmentCode.c_str();
@@ -57,37 +60,37 @@ namespace openGLTask
 
     }
 
-    void Shader::use() const
+    void CShader::use() const
     {
         glUseProgram(m_ID);
     }
 
-    void Shader::setInt(const std::string& vName, int vValue) const
+    void CShader::setInt(const std::string& vName, int vValue) const
     {
         glUniform1i(glGetUniformLocation(m_ID, vName.c_str()), vValue);
     }
 
-    void Shader::setFloat(const std::string& vName, float vValue) const
+    void CShader::setFloat(const std::string& vName, float vValue) const
     {
         glUniform1f(glGetUniformLocation(m_ID, vName.c_str()), vValue);
     }
 
-    void Shader::setVec3(const std::string& vName, const glm::vec3& vValue) const
+    void CShader::setVec3(const std::string& vName, const glm::vec3& vValue) const
     {
         glUniform3fv(glGetUniformLocation(m_ID, vName.c_str()), 1, &vValue[0]);
     }
 
-    void Shader::setVec3(const std::string& vName, float vPosx, float vPosy, float vPosz) const
+    void CShader::setVec3(const std::string& vName, float vPosx, float vPosy, float vPosz) const
     {
         glUniform3f(glGetUniformLocation(m_ID, vName.c_str()), vPosx, vPosy, vPosz);
     }
 
-    void Shader::setMat4(const std::string& vName, const glm::mat4& vMat) const
+    void CShader::setMat4(const std::string& vName, const glm::mat4& vMat) const
     {
         glUniformMatrix4fv(glGetUniformLocation(m_ID, vName.c_str()), 1, GL_FALSE, &vMat[0][0]);
     }
 
-    void Shader::__checkCompileErrors(GLuint vShader, std::string vType)
+    void CShader::__checkCompileErrors(GLuint vShader, std::string vType)
     {
         GLint Success;
         GLchar InfoLog[1024];

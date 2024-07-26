@@ -1,16 +1,10 @@
-#ifndef SHADER_S_H
-#define SHADER_S_H
-
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 
 namespace openGLTask
 {
-    class Shader
+    class CShader
     {
     private:
         void __checkCompileErrors(GLuint vShader, std::string vType);
@@ -18,7 +12,7 @@ namespace openGLTask
     public:
         unsigned int m_ID;
 
-        Shader(const char* vVertexPath, const char* vFragmentPath);
+        CShader(const char* vVertexPath, const char* vFragmentPath);
 
         void use() const;
         void setInt(const std::string& vName, int vValue) const;
@@ -28,4 +22,3 @@ namespace openGLTask
         void setMat4(const std::string& vName, const glm::mat4& vMat) const;
     };
 }
-#endif

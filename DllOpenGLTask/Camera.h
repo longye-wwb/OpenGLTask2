@@ -11,13 +11,13 @@ namespace openGLTask
 		glm::vec3 m_Up;
 
 		void __updateViewMatrix();
-		void __setWorldPos(const glm::vec3& vPosition);
-		void __setFront(const glm::vec3& vFront);
-		void __setWorldUp(const glm::vec3& vWorldUp);
 
 	public:
 		CCamera();
 
+		void setWorldPos(const glm::vec3& vPosition);
+		void setFront(const glm::vec3& vFront);
+		void setWorldUp(const glm::vec3& vWorldUp);
 		const glm::mat4& getViewMatrix() const { return m_ViewMatrix; }
 		const glm::vec3& getWorldPos() const { return m_Position; }
 		const glm::vec3& getFront() const { return m_Front; }
