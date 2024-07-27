@@ -129,7 +129,10 @@ namespace openGLTask
 			m_pShader->setVec3("uViewPos", m_pCamera->getWorldPos());
 			m_pShader->setFloat("uShininess", 32.0f);
 			m_pShader->setFloat("uAmbientStrength", 0.1f);
-			m_pShader->setVec3("uDirection", vFunCallback(m_pDirectionalLight));
+			if (!m_pKeyBoardController->getEState())
+			{
+				m_pShader->setVec3("uDirection", vFunCallback(m_pDirectionalLight));
+			}
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
 			m_pShader->setMat4("uProjection", ProjectionMat);
