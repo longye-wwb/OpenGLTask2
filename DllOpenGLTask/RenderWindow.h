@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "VertexBuffer.h"
+#include "keyBoardInput.h"
 
 namespace openGLTask 
 {
@@ -30,12 +31,15 @@ namespace openGLTask
 		std::shared_ptr<CShader> m_pShader = nullptr;
 		std::shared_ptr<CCamera> m_pCamera = nullptr;
 		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
+		std::shared_ptr<CkeyBoardInput> m_pKeyBoardController = nullptr;
+		
 
 		GLFWwindow* __createWindow();
 		bool __initParametersFromXML();
 		bool __readXML(CRenderConfiguration& vConfig, const std::string& vXMLName);
 		void __setAndBindVertices();
 		void __setAndBindShader();
+		void __setAndBindKeyInputController();
 		void __checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp);
 		void __checkAndSetLightDirection(std::optional<std::tuple<double, double, double>> vLightDirection);
 		void __checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight);
@@ -51,7 +55,7 @@ namespace openGLTask
 
 	public:
 		CRenderWindow();
-
+		bool m_ShaderState = false;
 		void startRun(std::function<glm::vec3(std::shared_ptr<openGLTask::CDirectionalLight>)> vFunCallback);
 		int getWidth() { return m_Width; }
 		int getHeight() { return m_Height; }
@@ -61,5 +65,6 @@ namespace openGLTask
 		int getMinorVersion() { return m_MinorVersion; }
 		bool getUseCoreProfile() { return m_UseCoreProfile; }
 		const std::string& getWinName() { return m_WinName; }
+		const std::shared_ptr<CkeyBoardInput>& getKeyBoardInput() const { return m_pKeyBoardController; }
 	};
 }

@@ -6,10 +6,9 @@
 
 namespace openGLTask 
 {
-
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"), m_LightDirection(glm::vec3(0.0f, 0.0f, 1.0f)),
 		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
-		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
+		m_pKeyBoardController(nullptr), m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
 	}
@@ -63,7 +62,7 @@ namespace openGLTask
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, getMajorVersion());
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, getMinorVersion());
 		glfwWindowHint(GLFW_OPENGL_PROFILE, getUseCoreProfile() ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-		
+
 		m_pWindow = glfwCreateWindow(getWidth(), getHeight(), getWinName().c_str(), nullptr, nullptr);
 		if (m_pWindow == nullptr)
 		{
@@ -71,10 +70,21 @@ namespace openGLTask
 			glfwTerminate();
 			return m_pWindow;
 		}
+		__setAndBindKeyInputController();
 		glfwMakeContextCurrent(m_pWindow);
 		glfwSetWindowPos(m_pWindow, getPosX(), getPosY());
+		glfwSetWindowUserPointer(m_pWindow, this);
 		glfwSetFramebufferSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height) {
 			glViewport(0, 0, width, height); });
+		glfwSetKeyCallback(m_pWindow, [](GLFWwindow* vWindow, int key, int scancode, int action, int mods)
+		{
+				if (action==GLFW_PRESS)
+				{
+					auto pRenderWindow = (CRenderWindow*)glfwGetWindowUserPointer(vWindow);
+					pRenderWindow->getKeyBoardInput()->onKeyDown(key);
+					std::cout << pRenderWindow->getKeyBoardInput()->getQState();
+				}	
+		});
 		return m_pWindow;
 	}
 
@@ -143,7 +153,7 @@ namespace openGLTask
 			//Verices              Color             Normal
 			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
 			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
+			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,	
 			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
 		};
 		std::vector<unsigned int> Indices = {
@@ -157,6 +167,12 @@ namespace openGLTask
 	void CRenderWindow::__setAndBindShader()
 	{
 		m_pShader = std::make_shared<CShader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
+	}
+
+	void CRenderWindow::__setAndBindKeyInputController()
+	{
+		m_pKeyBoardController= std::make_shared<CkeyBoardInput>();
+		std::cout << m_pKeyBoardController;
 	}
 
 
@@ -359,5 +375,4 @@ namespace openGLTask
 		m_ScreenMaxWidth = pMode->width;
 		m_ScreenMaxHeight = pMode->height;
 	}
-
 }
