@@ -1,8 +1,7 @@
 #version 460 core
 out vec4 FragColor;
 
-in vec3 vFragPos;  
-in vec3 vObjColor;  
+in vec3 vFragPos;    
 in vec3 vNormal;
 
 uniform vec3 uViewPos;
@@ -12,7 +11,7 @@ uniform vec3 uDirection;
 
 void main()
 {
-    vec3 lightColor=vec3(1.0f, 1.0f, 1.0f);
+    vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 
     // ambient
     vec3 ambient = uAmbientStrength * lightColor;
@@ -29,6 +28,6 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uShininess);
     vec3 specular =  spec * lightColor;
         
-    vec3 result = (ambient + diffuse + specular)*vObjColor;
+    vec3 result = (ambient + diffuse + specular) * vec3(1.0f, 0.0f, 0.0f);
     FragColor = vec4(result, 1.0);
 } 

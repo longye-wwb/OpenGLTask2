@@ -5,22 +5,22 @@
 
 namespace openGLTask {
 
-	CVertexBuffer::CVertexBuffer(const std::vector<float>& vVertices, const std::vector<int>& vVertexIndex, GLenum vDrawMode, GLenum vUsage)
+	CVertexBuffer::CVertexBuffer(const std::vector<float>& vVertices, const std::vector<int>& vVertexIndexLayout, GLenum vDrawMode, GLenum vUsage)
 	:m_VAO(0), m_VBO(0), m_EBO(0), m_DrawMode(vDrawMode),m_VerticesCount(vVertices.size())
 	{
-		int VertexCount = std::accumulate(vVertexIndex.begin(), vVertexIndex.end(), 0);
+		int VertexCount = std::accumulate(vVertexIndexLayout.begin(), vVertexIndexLayout.end(), 0);
 		m_VerticesCount = vVertices.size() / VertexCount;
 		glGenVertexArrays(1, &m_VAO);
 		glGenBuffers(1, &m_VBO);
 		glBindVertexArray(m_VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vVertices.size(), vVertices.data(), vUsage);
-		__configVertex(vVertexIndex);
+		__configVertex(vVertexIndexLayout);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 
-	CVertexBuffer::CVertexBuffer(const std::vector<float>& vVertices,const std::vector<unsigned int>& vIndices, const std::vector<int>& vVertexIndex, GLenum vDrawMode, GLenum vUsage)
+	CVertexBuffer::CVertexBuffer(const std::vector<float>& vVertices,const std::vector<unsigned int>& vIndices, const std::vector<int>& vVertexIndexLayout, GLenum vDrawMode, GLenum vUsage)
 	:m_VAO(0), m_VBO(0), m_EBO(0), m_DrawMode(vDrawMode),m_VerticesCount(vVertices.size())
 	{
 		glGenVertexArrays(1, &m_VAO);
@@ -31,7 +31,7 @@ namespace openGLTask {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vVertices.size(), vVertices.data(), vUsage);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * vIndices.size(), vIndices.data(), vUsage);
-		__configVertex(vVertexIndex);
+		__configVertex(vVertexIndexLayout);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
@@ -50,15 +50,15 @@ namespace openGLTask {
 		else glDrawArrays(m_DrawMode, 0, m_VerticesCount);
 	}
 
-	void CVertexBuffer::__configVertex(const std::vector<int>& vVertexIndex)
+	void CVertexBuffer::__configVertex(const std::vector<int>& vVertexIndexLayout)
 	{
-		int VertexCount= std::accumulate(vVertexIndex.begin(), vVertexIndex.end(), 0);
+		int VertexCount= std::accumulate(vVertexIndexLayout.begin(), vVertexIndexLayout.end(), 0);
 		int TempCount = 0;
-		for (int i = 0; i <3; ++i)
+		for (int i = 0; i < vVertexIndexLayout.size(); ++i)
 		{
-			glVertexAttribPointer(i, vVertexIndex[i], GL_FLOAT, GL_FALSE, VertexCount * sizeof(float), (void*)(TempCount* sizeof(float)));
+			glVertexAttribPointer(i, vVertexIndexLayout[i], GL_FLOAT, GL_FALSE, VertexCount * sizeof(float), (void*)(TempCount* sizeof(float)));
 			glEnableVertexAttribArray(i);
-			TempCount += vVertexIndex[i];
+			TempCount += vVertexIndexLayout[i];
 		}
 	}
 }

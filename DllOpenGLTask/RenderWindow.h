@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "VertexBuffer.h"
+#include <tiny_gltf.h>
 
 namespace openGLTask 
 {
@@ -32,6 +33,10 @@ namespace openGLTask
 		GLFWwindow* __createWindow();
 		bool __initParametersFromXML();
 		bool __readXML(CRenderConfiguration& vConfig, const std::string& vXMLName);
+		bool __loadGLTF(const std::string& vFilename, tinygltf::Model& vModelGLTF);
+		void __createVerticeAndIndice(tinygltf::Model& vGLTFModel, std::vector<float>& vioVertices, std::vector<unsigned int>& vioIndices);
+		void __createVertexBufferData(std::vector<float>& vVertices, const tinygltf::Buffer& vBuffer, const int vIndex);
+		void __createIndiceBufferData(std::vector<unsigned int>& vIndices, const tinygltf::BufferView& vBufferView, const tinygltf::Buffer& vBuffer, const int& vComponentType);
 		void __setAndBindVertices();
 		void __setAndBindShader();
 		void __checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp);

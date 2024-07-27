@@ -1,7 +1,6 @@
 #version 460 core
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-layout (location = 2) in vec3 aNormal;
+layout (location = 1) in vec3 aNormal;
 
 out vec3 vLightingColor;
 
@@ -18,7 +17,6 @@ void main()
     vec3 FragPos = vec3(uModel * vec4(aPos, 1.0));
     vec3 Normal = mat3(transpose(inverse(uModel))) * aNormal;  
     gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
-    vec3 ObjColor = aColor;
 
     vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
     // ambient
@@ -36,5 +34,5 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uShininess);
     vec3 specular =  spec * lightColor;
         
-    vLightingColor = (ambient + diffuse + specular)*ObjColor;
+    vLightingColor = (ambient + diffuse + specular) * vec3(1.0f, 1.0f, 0.0f);
 }

@@ -1,8 +1,15 @@
 #include "pch.h"
+#include "RenderWindow.h"
 #include <vector>
 #include <optional>
 #include <filesystem>
-#include "RenderWindow.h"
+#include <tiny_gltf.h>
+
+#define TINYGLTF_MODE_DEFAULT -1 
+#define TINYGLTF_MODE_POINT 0
+#define TINYGLTF_MODE_TRIANGLE 4 
+#define TINYGLTF_COMPONETTYPE_UNSHORT 5123
+#define TINYGLTF_COMPONETTYPE_UNINT   5125
 
 namespace openGLTask 
 {
@@ -49,8 +56,10 @@ namespace openGLTask
 		return true;
 	}
 
-	GLFWwindow* CRenderWindow::__createWindow() {
-		if (!__initParametersFromXML()) {
+	GLFWwindow* CRenderWindow::__createWindow() 
+	{
+		if (!__initParametersFromXML()) 
+		{
 			HIVE_LOG_ERROR("Can't read config file, use default settings.");
 		}
 		if (m_pWindow != nullptr)
@@ -81,7 +90,8 @@ namespace openGLTask
 	void CRenderWindow::startRun()
 	{
 		GLFWwindow* m_pWindow = __createWindow();
-		if (m_pWindow == nullptr) {
+		if (m_pWindow == nullptr) 
+		{
 			HIVE_LOG_ERROR("Window is not initialized!");
 			return;
 		}
@@ -107,7 +117,7 @@ namespace openGLTask
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
 			m_pShader->setMat4("uProjection", ProjectionMat);
 			m_pShader->setMat4("uView", ViewMat);
-			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 Model = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
 			m_pShader->setMat4("uModel", Model);
 
 			m_pVertexBuffer->draw();
@@ -140,21 +150,141 @@ namespace openGLTask
 		}
 	}
 	
+	bool CRenderWindow::__loadGLTF(const std::string& vFilename, tinygltf::Model& vModelGLTF)
+	{
+		tinygltf::TinyGLTF Loader;
+		std::string Err;
+		std::string Warn;
+
+		bool res = Loader.LoadASCIIFromFile(&vModelGLTF, &Err, &Warn, vFilename);
+
+		if (!Warn.empty()) {
+			HIVE_LOG_WARNING("WARN: {}", Warn);
+		}
+
+		if (!Err.empty()) {
+			HIVE_LOG_ERROR("ERR: {}", Err);
+		}
+
+		if (!res) {
+			HIVE_LOG_ERROR("Failed to load glTF: {}", vFilename);
+		}
+		else {
+			HIVE_LOG_INFO("Loaded glTF: {}", vFilename);
+		}
+
+		return res;
+	}
+
+	void CRenderWindow::__createIndiceBufferData(std::vector<unsigned int>& vIndices, const tinygltf::BufferView& vBufferView, const tinygltf::Buffer& vBuffer, const int& vComponentType)
+	{
+		unsigned short tempUShortIndice;
+		unsigned int   tempUIntIndice;
+		const int UnShortByte = 2;
+		const int UnIntByte = 4;
+		if (vComponentType == TINYGLTF_COMPONETTYPE_UNSHORT) {
+			for (size_t i = vBufferView.byteOffset; i < vBufferView.byteOffset + vBufferView.byteLength; i += UnShortByte) {
+				std::memcpy(&tempUShortIndice, &vBuffer.data.at(i), sizeof(unsigned short));
+				vIndices.push_back(tempUShortIndice);
+			}
+		}
+		else if (vComponentType == TINYGLTF_COMPONETTYPE_UNINT) {
+			for (size_t i = vBufferView.byteOffset; i < vBufferView.byteOffset + vBufferView.byteLength; i += UnIntByte) {
+				std::memcpy(&tempUIntIndice, &vBuffer.data.at(i), sizeof(unsigned int));
+				vIndices.push_back(tempUIntIndice);
+			}
+		}
+	}
+
+	void CRenderWindow::__createVertexBufferData(std::vector<float>& vVertices, const tinygltf::Buffer& vBuffer, const int vIndex) {
+		float tempVertice;
+		const int FloatByte = 4;
+		const int FloatNum = 3;
+		for (auto i = vIndex; i < vIndex + FloatNum * FloatByte; i += FloatByte) {
+			std::memcpy(&tempVertice, &vBuffer.data.at(i), sizeof(float));
+			vVertices.push_back(tempVertice);
+		}
+	}
+
+	void CRenderWindow::__createVerticeAndIndice(tinygltf::Model& vGLTFModel, std::vector<float>& vioVertices, std::vector<unsigned int>& vioIndices)
+	{
+		for (auto& node : vGLTFModel.nodes) 
+		{
+			if (node.mesh == -1) continue;
+			const auto& Mesh = vGLTFModel.meshes[node.mesh];
+			std::string MeshName = Mesh.name;
+			HIVE_LOG_INFO("MeshName : {}", MeshName);
+
+			for (auto& primitive : Mesh.primitives)
+			{
+				vioVertices.clear();
+				if (primitive.mode == TINYGLTF_MODE_POINT) 
+				{
+					const tinygltf::Accessor& AccessorPos = vGLTFModel.accessors[primitive.attributes.at("POSITION")];
+					const tinygltf::BufferView& BufferViewPos = vGLTFModel.bufferViews[AccessorPos.bufferView];
+					const tinygltf::Buffer& BufferPos = vGLTFModel.buffers[BufferViewPos.buffer];
+					const tinygltf::Accessor& AccessorColor = vGLTFModel.accessors[primitive.attributes.at("COLOR_0")];
+					const tinygltf::BufferView& BufferViewColor = vGLTFModel.bufferViews[AccessorColor.bufferView];
+					const tinygltf::Buffer& BufferColor = vGLTFModel.buffers[BufferViewColor.buffer];
+					glm::vec3 MinPos(AccessorPos.minValues[0], AccessorPos.minValues[1], AccessorPos.minValues[2]);
+					glm::vec3 MaxPos(AccessorPos.maxValues[0], AccessorPos.maxValues[1], AccessorPos.maxValues[2]);
+
+					const int Vec3Byte = 12;
+					for (size_t i = BufferViewPos.byteOffset, k = BufferViewColor.byteOffset;
+						(i < BufferViewPos.byteOffset + BufferViewPos.byteLength && k < BufferViewColor.byteOffset + BufferViewColor.byteLength);
+						i += Vec3Byte, k += Vec3Byte) {
+						__createVertexBufferData(vioVertices, BufferPos, (int)i);
+						__createVertexBufferData(vioVertices, BufferColor, (int)k);
+					}
+
+					HIVE_LOG_INFO("Vertices.size : {}", vioVertices.size());
+					assert(vioVertices.size() == vGLTFModel.accessors[primitive.attributes.at("POSITION")].count * 3 * 2);
+				}
+				else if (primitive.mode == TINYGLTF_MODE_TRIANGLE || primitive.mode == TINYGLTF_MODE_DEFAULT) 
+				{
+					vioVertices.clear();
+					vioIndices.clear();
+					const tinygltf::BufferView& BufferViewIndice = vGLTFModel.bufferViews[vGLTFModel.accessors[primitive.indices].bufferView];
+					const tinygltf::Buffer& BufferIndice = vGLTFModel.buffers[BufferViewIndice.buffer];
+					const int IndiceComponentType = vGLTFModel.accessors[primitive.indices].componentType;
+
+					__createIndiceBufferData(vioIndices, BufferViewIndice, BufferIndice, IndiceComponentType);
+					HIVE_LOG_INFO("indice.size : {}", vioIndices.size());
+					assert(vioIndices.size() == vGLTFModel.accessors[primitive.indices].count);
+
+					const tinygltf::BufferView& BufferViewPos = vGLTFModel.bufferViews[vGLTFModel.accessors[primitive.attributes.at("POSITION")].bufferView];
+					const tinygltf::Buffer& BufferPos = vGLTFModel.buffers[BufferViewPos.buffer];
+					const tinygltf::BufferView& BufferViewNor = vGLTFModel.bufferViews[vGLTFModel.accessors[primitive.attributes.at("NORMAL")].bufferView];
+					const tinygltf::Buffer& BufferNor = vGLTFModel.buffers[BufferViewNor.buffer];
+
+					assert(BufferViewPos.byteLength == BufferViewNor.byteLength);
+
+					const int Vec3Byte = 12;
+					for (size_t i = BufferViewPos.byteOffset, k = BufferViewNor.byteOffset;
+						(i < BufferViewPos.byteOffset + BufferViewPos.byteLength && k < BufferViewNor.byteOffset + BufferViewNor.byteLength);
+						i += Vec3Byte, k += Vec3Byte) 
+					{
+						__createVertexBufferData(vioVertices, BufferPos, (int)i);
+						__createVertexBufferData(vioVertices, BufferNor, (int)k);
+					}
+					HIVE_LOG_INFO("Vertices.size : {}", vioVertices.size());
+					assert(vioVertices.size() == vGLTFModel.accessors[primitive.attributes.at("POSITION")].count * 6);
+				}
+			}
+		}
+		return;
+	}
+
 	void CRenderWindow::__setAndBindVertices()
 	{
-		std::vector<float>Vertices = {
-			//Verices              Color             Normal
-			 0.5f, 0.5f, 0.0f,  1.0f,0.0f,0.0f,  0.0f,0.0f,1.0f,
-			 0.5f,-0.5f, 0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-			-0.5f,-0.5f, 0.0f,  0.0f,0.0f,1.0f,  0.0f,0.0f,1.0f,
-			-0.5f, 0.5f, 0.0f,  1.0f,1.0f,0.0f,  0.0f,0.0f,1.0f,
-		};
-		std::vector<unsigned int> Indices = {
-			0, 1, 3,
-			1, 2, 3
-		};
-
-		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices, std::vector<int>{3, 3, 3}, GL_TRIANGLES, GL_STATIC_DRAW);
+		tinygltf::Model GLTFModel;
+		const std::string FilePath = "../models/dragon.gltf";
+		__loadGLTF(FilePath, GLTFModel);
+		
+		std::vector<float> Vertices;
+		std::vector<unsigned int> Indices;
+		__createVerticeAndIndice(GLTFModel, Vertices, Indices);
+		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices, std::vector<int>{3, 3}, GL_TRIANGLES, GL_STATIC_DRAW);
 	}
 
 	void CRenderWindow::__setAndBindShader()
@@ -296,17 +426,21 @@ namespace openGLTask
 		return;
 	}
 	
-	bool CRenderWindow::__isOpenGLVersionValid(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion) {
-		if (!vMajorVersion.has_value() || !vMinorVersion.has_value()) {
+	bool CRenderWindow::__isOpenGLVersionValid(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion) 
+	{
+		if (!vMajorVersion.has_value() || !vMinorVersion.has_value()) 
+		{
 			return false;
 		}
 
 		int Major = vMajorVersion.value();
 		int Minor = vMinorVersion.value();
 
-		switch (Major) {
+		switch (Major) 
+		{
 		case 1:
-			switch (Minor) {
+			switch (Minor) 
+			{
 			case 0:
 			case 1:
 				return true;
@@ -314,7 +448,8 @@ namespace openGLTask
 				return false;
 			}
 		case 2:
-			switch (Minor) {
+			switch (Minor) 
+			{
 			case 0:
 			case 1:
 				return true;
@@ -322,7 +457,8 @@ namespace openGLTask
 				return false;
 			}
 		case 3:
-			switch (Minor) {
+			switch (Minor) 
+			{
 			case 0:
 			case 1:
 			case 2:
@@ -332,7 +468,8 @@ namespace openGLTask
 				return false;
 			}
 		case 4:
-			switch (Minor) {
+			switch (Minor) 
+			{
 			case 0:
 			case 1:
 			case 2:
@@ -348,7 +485,8 @@ namespace openGLTask
 		}
 	}
 
-	void CRenderWindow::__setAndGetScreenSize() {
+	void CRenderWindow::__setAndGetScreenSize() 
+	{
 		glfwInit();
 		GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
 		if (pMonitor == nullptr) {
