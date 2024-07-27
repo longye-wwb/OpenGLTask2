@@ -24,7 +24,7 @@ namespace openGLTask
 	bool CRenderWindow::__initParametersFromXML()
 	{
 		CRenderConfiguration Config;
-		if (!CRenderWindow::__readXML(Config, "./config/config.xml")) {
+		if (!CRenderWindow::__readXML(Config, "../XML/config.xml")) {
 			return false;
 		}
 
@@ -36,9 +36,19 @@ namespace openGLTask
 		std::optional<int> MinorVersion = Config.getAttribute<int>("MinorVersion");
 		std::optional<std::string> WinName = Config.getAttribute<std::string>("WinName");
 		std::optional<bool> UseCoreProfile = Config.getAttribute<bool>("UseCoreProfile");
-		std::optional<std::string> VertShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_vs|SHADER_SOURCE_FILE").value();
-		std::optional<std::string> FragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
-		
+		std::optional<std::string> PixelVertShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_vs|SHADER_SOURCE_FILE").value();
+		std::optional<std::string> PixelFragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
+		std::optional<std::string> VtexVertShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_vs|SHADER_SOURCE_FILE").value();
+		std::optional<std::string> VtexFragShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_fs|SHADER_SOURCE_FILE").value();
+		if (VtexVertShaderPath.has_value()) 
+		{
+			std::cout << VtexVertShaderPath.value();
+		}
+		if (VtexVertShaderPath.has_value()) 
+		{
+			std::cout << VtexFragShaderPath.value();
+		}
+
 		std::optional<std::tuple<double, double, double>> CamPos = Config.getAttribute<std::tuple<double, double, double>>("CameraPos");
 		std::optional<std::tuple<double, double, double>> CameraFront = Config.getAttribute<std::tuple<double, double, double>>("CameraFront");
 		std::optional<std::tuple<double, double, double>> CameraUp = Config.getAttribute<std::tuple<double, double, double>>("CameraUp");
@@ -50,7 +60,7 @@ namespace openGLTask
 		__checkAndSetOpenGLVersion(MajorVersion, MinorVersion);
 		__checkAndSetWinName(WinName);
 		__checkAndSetProfile(UseCoreProfile);
-		__checkAndSetShaderGLSL(VertShaderPath, FragShaderPath);
+		__checkAndSetShaderGLSL(PixelVertShaderPath, PixelFragShaderPath);
 		__checkAndBindCamera(CamPos, CameraFront, CameraUp);
 		__checkAndSetLightDirection(LightDirection);
 		return true;
@@ -405,14 +415,14 @@ namespace openGLTask
 		return;
 	}
 
-	void CRenderWindow::__checkAndSetShaderGLSL(std::optional<std::string> vVertShaderPath, std::optional<std::string> vFragShaderPath)
+	void CRenderWindow::__checkAndSetShaderGLSL(std::optional<std::string> vPixelVertShaderPath, std::optional<std::string> vPixelFragShaderPath)
 	{
-		if (vVertShaderPath.has_value() && vFragShaderPath.has_value())
+		if (vPixelVertShaderPath.has_value() && vPixelFragShaderPath.has_value())
 		{
-			if (std::filesystem::exists(vVertShaderPath.value()) && std::filesystem::exists(vFragShaderPath.value()))
+			if (std::filesystem::exists(vPixelVertShaderPath.value()) && std::filesystem::exists(vPixelFragShaderPath.value()))
 			{
-				m_VertShaderPath = vVertShaderPath.value();
-				m_FragShaderPath = vFragShaderPath.value();
+				m_VertShaderPath = vPixelVertShaderPath.value();
+				m_FragShaderPath = vPixelFragShaderPath.value();
 			}
 			else
 			{

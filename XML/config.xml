@@ -30,8 +30,8 @@
   <SHADER_SOURCE_FILE> ../shaders/fragPerVertexShading.glsl </SHADER_SOURCE_FILE>
 </SHADER>
 
-<RENDER_ALGORITHM> PerpixelShading
-  <RENDER_PASS> perpixel_shading
+<RENDER_ALGORITHM> PerVertexShading
+  <RENDER_PASS> pervertex_shading
     <VERTEX_SHADER> shader_pervertex_shading_vs </VERTEX_SHADER>
     <FRAGMENT_SHADER> shader_pervertex_shading_fs </FRAGMENT_SHADER>
   </RENDER_PASS>

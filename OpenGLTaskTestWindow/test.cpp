@@ -3,7 +3,11 @@
 #include <GLFW/glfw3.h>
 #include "RenderWindow.h"
 
-TEST(TestCaseName, TestName) {
-  EXPECT_EQ(1, 1);
-  EXPECT_TRUE(true);
+TEST(TestOnlyOneWindowOnceDraw, DllOpenGLTask) {
+    std::shared_ptr<openGLTask::CRenderWindow> pRenderWindow = std::make_shared<openGLTask::CRenderWindow>();
+    pRenderWindow->startRun();
+    pRenderWindow->startRun();
+    pRenderWindow->startRun();
+    pRenderWindow->startRun();
+    pRenderWindow->startRun();
 }
