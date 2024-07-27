@@ -13,28 +13,22 @@ namespace openGLTask
 {
 	class OPENGLTASK_API CRenderWindow
 	{	
-	private:
-		int m_MajorVersion;
-		int m_MinorVersion;
-		int m_Width;
-		int m_Height;
-		int m_PosX;
-		int m_PosY;
-		std::string m_WinName;
-		std::string m_VertShaderPath;
-		std::string m_FragShaderPath;
-		bool m_UseCoreProfile;
-		int m_ScreenMaxWidth;
-		int m_ScreenMaxHeight;
-		glm::vec3 m_LightDirection;
-		GLFWwindow* m_pWindow = nullptr;
-		std::shared_ptr<CVertexBuffer> m_pVertexBuffer = nullptr;
-		std::shared_ptr<CShader> m_pShader = nullptr;
-		std::shared_ptr<CCamera> m_pCamera = nullptr;
-		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
-		std::shared_ptr<CkeyBoardInput> m_pKeyBoardController = nullptr;
-		
+	public:
+		CRenderWindow();
 
+		bool m_ShaderState = false;
+		void startRun(std::function<glm::vec3(std::shared_ptr<openGLTask::CDirectionalLight>)> vFunCallback);
+		int getWidth() { return m_Width; }
+		int getHeight() { return m_Height; }
+		int getPosX() { return m_PosX; }
+		int getPosY() { return m_PosY; }
+		int getMajorVersion() { return m_MajorVersion; }
+		int getMinorVersion() { return m_MinorVersion; }
+		bool getUseCoreProfile() { return m_UseCoreProfile; }
+		const std::string& getWinName() { return m_WinName; }
+		const std::shared_ptr<CkeyBoardInput>& getKeyBoardInput() const { return m_pKeyBoardController; }
+	
+	private:
 		GLFWwindow* __createWindow();
 		bool __initParametersFromXML();
 		bool __readXML(CRenderConfiguration& vConfig, const std::string& vXMLName);
@@ -58,18 +52,26 @@ namespace openGLTask
 		void __setHeight(int vHeight) { m_Height = vHeight; }
 		void __setAndGetScreenSize();
 
-	public:
-		CRenderWindow();
-		bool m_ShaderState = false;
-		void startRun(std::function<glm::vec3(std::shared_ptr<openGLTask::CDirectionalLight>)> vFunCallback);
-		int getWidth() { return m_Width; }
-		int getHeight() { return m_Height; }
-		int getPosX() { return m_PosX; }
-		int getPosY() { return m_PosY; }
-		int getMajorVersion() { return m_MajorVersion; }
-		int getMinorVersion() { return m_MinorVersion; }
-		bool getUseCoreProfile() { return m_UseCoreProfile; }
-		const std::string& getWinName() { return m_WinName; }
-		const std::shared_ptr<CkeyBoardInput>& getKeyBoardInput() const { return m_pKeyBoardController; }
+		int m_MajorVersion;
+		int m_MinorVersion;
+		int m_Width;
+		int m_Height;
+		int m_PosX;
+		int m_PosY;
+		std::string m_WinName;
+		std::string m_PixelVertShaderPath;
+		std::string m_PixelFragShaderPath;
+		std::string m_VertexVertShaderPath;
+		std::string m_VertexFragShaderPath;
+		bool m_UseCoreProfile;
+		int m_ScreenMaxWidth;
+		int m_ScreenMaxHeight;
+		glm::vec3 m_LightDirection;
+		GLFWwindow* m_pWindow = nullptr;
+		std::shared_ptr<CVertexBuffer> m_pVertexBuffer = nullptr;
+		std::shared_ptr<CShader> m_pShader = nullptr;
+		std::shared_ptr<CCamera> m_pCamera = nullptr;
+		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
+		std::shared_ptr<CkeyBoardInput> m_pKeyBoardController = nullptr;
 	};
 }

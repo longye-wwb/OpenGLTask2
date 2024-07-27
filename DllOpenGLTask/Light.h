@@ -1,6 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
-namespace openGLTask {
+
+namespace openGLTask 
+{
 	class CLight
 	{
 	public:

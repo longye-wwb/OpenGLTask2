@@ -1,9 +1,11 @@
 #include "VertexBuffer.h"
 #include <numeric>
+
 #define VEC3 3
 #define STRIDE 9
 
-namespace openGLTask {
+namespace openGLTask 
+{
 
 	CVertexBuffer::CVertexBuffer(const std::vector<float>& vVertices, const std::vector<int>& vVertexIndexLayout, GLenum vDrawMode, GLenum vUsage)
 	:m_VAO(0), m_VBO(0), m_EBO(0), m_DrawMode(vDrawMode),m_VerticesCount(vVertices.size())

@@ -15,7 +15,8 @@ namespace openGLTask
 {
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"), m_LightDirection(glm::vec3(0.0f, 0.0f, 1.0f)),
 		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
-		m_pKeyBoardController(nullptr), m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
+		m_pKeyBoardController(nullptr), m_PixelVertShaderPath("../shaders/vertPerPixelShading.glsl"), m_PixelFragShaderPath("../shaders/fragPerPixelShading.glsl"),
+		m_VertexVertShaderPath("../shaders/vertPerVertexShading.glsl"),m_VertexFragShaderPath("../shaders/fragPerVertexShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
 	}
@@ -23,7 +24,8 @@ namespace openGLTask
 	bool CRenderWindow::__initParametersFromXML()
 	{
 		CRenderConfiguration Config;
-		if (!CRenderWindow::__readXML(Config, "../XML/config.xml")) {
+		if (!CRenderWindow::__readXML(Config, "../XML/config.xml")) 
+		{
 			return false;
 		}
 
@@ -39,14 +41,6 @@ namespace openGLTask
 		std::optional<std::string> PixelFragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> VtexVertShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_vs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> VtexFragShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_fs|SHADER_SOURCE_FILE").value();
-		if (VtexVertShaderPath.has_value()) 
-		{
-			std::cout << VtexVertShaderPath.value();
-		}
-		if (VtexVertShaderPath.has_value()) 
-		{
-			std::cout << VtexFragShaderPath.value();
-		}
 
 		std::optional<std::tuple<double, double, double>> CamPos = Config.getAttribute<std::tuple<double, double, double>>("CameraPos");
 		std::optional<std::tuple<double, double, double>> CameraFront = Config.getAttribute<std::tuple<double, double, double>>("CameraFront");
@@ -89,21 +83,20 @@ namespace openGLTask
 			glfwTerminate();
 			return m_pWindow;
 		}
-		__setAndBindKeyInputController();
+
 		glfwMakeContextCurrent(m_pWindow);
 		glfwSetWindowPos(m_pWindow, getPosX(), getPosY());
-		glfwSetWindowUserPointer(m_pWindow, this);
 		glfwSetFramebufferSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height) {
 			glViewport(0, 0, width, height); });
+		glfwSetWindowUserPointer(m_pWindow, this);
 		glfwSetKeyCallback(m_pWindow, [](GLFWwindow* vWindow, int key, int scancode, int action, int mods)
-		{
-				if (action==GLFW_PRESS)
+			{
+				if (action == GLFW_PRESS)
 				{
 					auto pRenderWindow = (CRenderWindow*)glfwGetWindowUserPointer(vWindow);
 					pRenderWindow->getKeyBoardInput()->onKeyDown(key);
-					std::cout << pRenderWindow->getKeyBoardInput()->getQState();
-				}	
-		});
+				}
+			});
 		return m_pWindow;
 	}
 
@@ -118,13 +111,14 @@ namespace openGLTask
 		HIVE_LOG_INFO("GLAD : {}", gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
 
 		__setAndBindVertices();
-		__setAndBindShader();
+		__setAndBindKeyInputController();
 
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			__setAndBindShader();
 			m_pShader->use();
 			m_pShader->setVec3("uViewPos", m_pCamera->getWorldPos());
 			m_pShader->setFloat("uShininess", 32.0f);
@@ -199,13 +193,15 @@ namespace openGLTask
 		unsigned int   tempUIntIndice;
 		const int UnShortByte = 2;
 		const int UnIntByte = 4;
-		if (vComponentType == TINYGLTF_COMPONETTYPE_UNSHORT) {
+		if (vComponentType == TINYGLTF_COMPONETTYPE_UNSHORT)
+		{
 			for (size_t i = vBufferView.byteOffset; i < vBufferView.byteOffset + vBufferView.byteLength; i += UnShortByte) {
 				std::memcpy(&tempUShortIndice, &vBuffer.data.at(i), sizeof(unsigned short));
 				vIndices.push_back(tempUShortIndice);
 			}
 		}
-		else if (vComponentType == TINYGLTF_COMPONETTYPE_UNINT) {
+		else if (vComponentType == TINYGLTF_COMPONETTYPE_UNINT) 
+		{
 			for (size_t i = vBufferView.byteOffset; i < vBufferView.byteOffset + vBufferView.byteLength; i += UnIntByte) {
 				std::memcpy(&tempUIntIndice, &vBuffer.data.at(i), sizeof(unsigned int));
 				vIndices.push_back(tempUIntIndice);
@@ -217,7 +213,8 @@ namespace openGLTask
 		float tempVertice;
 		const int FloatByte = 4;
 		const int FloatNum = 3;
-		for (auto i = vIndex; i < vIndex + FloatNum * FloatByte; i += FloatByte) {
+		for (auto i = vIndex; i < vIndex + FloatNum * FloatByte; i += FloatByte) 
+		{
 			std::memcpy(&tempVertice, &vBuffer.data.at(i), sizeof(float));
 			vVertices.push_back(tempVertice);
 		}
@@ -249,7 +246,8 @@ namespace openGLTask
 					const int Vec3Byte = 12;
 					for (size_t i = BufferViewPos.byteOffset, k = BufferViewColor.byteOffset;
 						(i < BufferViewPos.byteOffset + BufferViewPos.byteLength && k < BufferViewColor.byteOffset + BufferViewColor.byteLength);
-						i += Vec3Byte, k += Vec3Byte) {
+						i += Vec3Byte, k += Vec3Byte) 
+					{
 						__createVertexBufferData(vioVertices, BufferPos, (int)i);
 						__createVertexBufferData(vioVertices, BufferColor, (int)k);
 					}
@@ -306,15 +304,20 @@ namespace openGLTask
 
 	void CRenderWindow::__setAndBindShader()
 	{
-		m_pShader = std::make_shared<CShader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
+		if (m_pKeyBoardController->getQState())
+		{
+			m_pShader = std::make_shared<CShader>(m_PixelVertShaderPath.c_str(), m_PixelFragShaderPath.c_str());
+		}
+		else
+		{
+			m_pShader = std::make_shared<CShader>(m_VertexVertShaderPath.c_str(), m_VertexFragShaderPath.c_str());
+		}
 	}
 
 	void CRenderWindow::__setAndBindKeyInputController()
 	{
-		m_pKeyBoardController= std::make_shared<CkeyBoardInput>();
-		std::cout << m_pKeyBoardController;
+		m_pKeyBoardController = std::make_shared<CkeyBoardInput>();
 	}
-
 
 	void CRenderWindow::__checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp)
 	{
@@ -437,8 +440,8 @@ namespace openGLTask
 		{
 			if (std::filesystem::exists(vPixelVertShaderPath.value()) && std::filesystem::exists(vPixelFragShaderPath.value()))
 			{
-				m_VertShaderPath = vPixelVertShaderPath.value();
-				m_FragShaderPath = vPixelFragShaderPath.value();
+				m_PixelVertShaderPath = vPixelVertShaderPath.value();
+				m_PixelFragShaderPath = vPixelFragShaderPath.value();
 			}
 			else
 			{
@@ -515,7 +518,8 @@ namespace openGLTask
 	{
 		glfwInit();
 		GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
-		if (pMonitor == nullptr) {
+		if (pMonitor == nullptr) 
+		{
 			HIVE_LOG_WARNING("Can't Get Monitor");
 			return;
 		}

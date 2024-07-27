@@ -4,14 +4,6 @@ namespace openGLTask
 {
 	class CCamera
 	{
-	private:
-		glm::mat4 m_ViewMatrix;
-		glm::vec3 m_Position;
-		glm::vec3 m_Front;
-		glm::vec3 m_Up;
-
-		void __updateViewMatrix();
-
 	public:
 		CCamera();
 
@@ -22,6 +14,14 @@ namespace openGLTask
 		const glm::vec3& getWorldPos() const { return m_Position; }
 		const glm::vec3& getFront() const { return m_Front; }
 		const glm::vec3& getUp() const { return m_Up; }
+
+	private:
+		void __updateViewMatrix();
+
+		glm::mat4 m_ViewMatrix;
+		glm::vec3 m_Position;
+		glm::vec3 m_Front;
+		glm::vec3 m_Up;
 	};
 }
 
