@@ -13,7 +13,7 @@
 
 namespace openGLTask 
 {
-	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"), m_LightDirection(glm::vec3(0.0f, 0.0f, 1.0f)),
+	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"),
 		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
 		m_pKeyBoardController(nullptr), m_PixelVertShaderPath("../shaders/vertPerPixelShading.glsl"), m_PixelFragShaderPath("../shaders/fragPerPixelShading.glsl"),
 		m_VertexVertShaderPath("../shaders/vertPerVertexShading.glsl"),m_VertexFragShaderPath("../shaders/fragPerVertexShading.glsl"),
@@ -112,7 +112,7 @@ namespace openGLTask
 
 		__setAndBindVertices();
 		__setAndBindKeyInputController();
-
+		
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -126,6 +126,10 @@ namespace openGLTask
 			if (!m_pKeyBoardController->getEState())
 			{
 				m_pShader->setVec3("uDirection", vFunCallback(m_pDirectionalLight));
+			}
+			else
+			{
+				m_pShader->setVec3("uDirection", m_pDirectionalLight->getDirection());
 			}
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
@@ -348,7 +352,7 @@ namespace openGLTask
 		//TODO:
 		if (vLightDirection.has_value())
 		{
-			m_LightDirection = glm::vec3(std::get<0>(vLightDirection.value()), std::get<1>(vLightDirection.value()), std::get<2>(vLightDirection.value()));
+			m_pDirectionalLight->setDirection(glm::vec3(std::get<0>(vLightDirection.value()), std::get<1>(vLightDirection.value()), std::get<2>(vLightDirection.value())));
 		}
 	}
 
