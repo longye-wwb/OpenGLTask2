@@ -1,13 +1,15 @@
 #pragma once
 #include "Light.h"
+#include "dllFile.h"
 namespace openGLTask 
 {
-	class CDirectionalLight:public CLight
+	class OPENGLTASK_API CDirectionalLight:public CLight
 	{
 	private:
 		glm::vec3 m_LightColor;
 		glm::vec3 m_LightPosition;
 		glm::vec3 m_LightDirection;
+
 	public:
 		CDirectionalLight();
 
@@ -17,7 +19,7 @@ namespace openGLTask
 		void setLightColor(const glm::vec3& vColor) override { m_LightColor = vColor; }
 		void setPosition(const glm::vec3& vPosition) override { m_LightPosition = vPosition; }
 		void setDirection(const glm::vec3& vDirection)  override { m_LightDirection = vDirection; }
-		glm::vec3 rotateLight(const float& vSpeed);
+		glm::vec3 rotateDirectionalLight(const float& vSpeed);
 	};
 }
 

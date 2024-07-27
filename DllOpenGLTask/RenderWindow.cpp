@@ -13,10 +13,9 @@
 
 namespace openGLTask 
 {
-
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"), m_LightDirection(glm::vec3(0.0f, 0.0f, 1.0f)),
-		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr),
-		m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
+		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
+		m_pKeyBoardController(nullptr), m_VertShaderPath("../shaders/vertPerpixelShading.glsl"), m_FragShaderPath("../shaders/fragPerpixelShading.glsl"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
 	}
@@ -82,7 +81,7 @@ namespace openGLTask
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, getMajorVersion());
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, getMinorVersion());
 		glfwWindowHint(GLFW_OPENGL_PROFILE, getUseCoreProfile() ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-		
+
 		m_pWindow = glfwCreateWindow(getWidth(), getHeight(), getWinName().c_str(), nullptr, nullptr);
 		if (m_pWindow == nullptr)
 		{
@@ -90,14 +89,25 @@ namespace openGLTask
 			glfwTerminate();
 			return m_pWindow;
 		}
+		__setAndBindKeyInputController();
 		glfwMakeContextCurrent(m_pWindow);
 		glfwSetWindowPos(m_pWindow, getPosX(), getPosY());
+		glfwSetWindowUserPointer(m_pWindow, this);
 		glfwSetFramebufferSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height) {
 			glViewport(0, 0, width, height); });
+		glfwSetKeyCallback(m_pWindow, [](GLFWwindow* vWindow, int key, int scancode, int action, int mods)
+		{
+				if (action==GLFW_PRESS)
+				{
+					auto pRenderWindow = (CRenderWindow*)glfwGetWindowUserPointer(vWindow);
+					pRenderWindow->getKeyBoardInput()->onKeyDown(key);
+					std::cout << pRenderWindow->getKeyBoardInput()->getQState();
+				}	
+		});
 		return m_pWindow;
 	}
 
-	void CRenderWindow::startRun()
+	void CRenderWindow::startRun(std::function<glm::vec3(std::shared_ptr<openGLTask::CDirectionalLight>)> vFunCallback)
 	{
 		GLFWwindow* m_pWindow = __createWindow();
 		if (m_pWindow == nullptr) 
@@ -119,10 +129,7 @@ namespace openGLTask
 			m_pShader->setVec3("uViewPos", m_pCamera->getWorldPos());
 			m_pShader->setFloat("uShininess", 32.0f);
 			m_pShader->setFloat("uAmbientStrength", 0.1f);
-			float AngularSpeed = glm::radians(180.0f);
-			float Angle = AngularSpeed * static_cast<float>(glfwGetTime());
-			glm::mat4 Rotation = glm::rotate(glm::mat4(1.0f), Angle, glm::vec3(0.0f, 1.0f, 0.0f));
-			m_pShader->setVec3("uDirection", glm::vec3(Rotation * glm::vec4(m_LightDirection, 0.0f)));
+			m_pShader->setVec3("uDirection", vFunCallback(m_pDirectionalLight));
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
 			m_pShader->setMat4("uProjection", ProjectionMat);
@@ -302,6 +309,13 @@ namespace openGLTask
 		m_pShader = std::make_shared<CShader>(m_VertShaderPath.c_str(), m_FragShaderPath.c_str());
 	}
 
+	void CRenderWindow::__setAndBindKeyInputController()
+	{
+		m_pKeyBoardController= std::make_shared<CkeyBoardInput>();
+		std::cout << m_pKeyBoardController;
+	}
+
+
 	void CRenderWindow::__checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp)
 	{
 		m_pCamera = std::make_shared<CCamera>();
@@ -324,6 +338,8 @@ namespace openGLTask
 
 	void CRenderWindow::__checkAndSetLightDirection(std::optional<std::tuple<double, double, double>> vLightDirection)
 	{
+		m_pDirectionalLight = std::make_shared<CDirectionalLight>();
+		//TODO:
 		if (vLightDirection.has_value())
 		{
 			m_LightDirection = glm::vec3(std::get<0>(vLightDirection.value()), std::get<1>(vLightDirection.value()), std::get<2>(vLightDirection.value()));
@@ -507,5 +523,4 @@ namespace openGLTask
 		m_ScreenMaxWidth = pMode->width;
 		m_ScreenMaxHeight = pMode->height;
 	}
-
 }
