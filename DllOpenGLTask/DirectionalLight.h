@@ -21,6 +21,10 @@ namespace openGLTask
 		glm::vec3 m_LightColor;
 		glm::vec3 m_LightPosition;
 		glm::vec3 m_LightDirection;	
+		float m_DeltaTime;
+		float m_LastFrame;
+		float m_RotationAngle;
+		float m_TimeScale;
 	};
 }
 

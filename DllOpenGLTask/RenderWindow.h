@@ -27,7 +27,7 @@ namespace openGLTask
 		bool getUseCoreProfile() { return m_UseCoreProfile; }
 		const std::string& getWinName() { return m_WinName; }
 		const std::shared_ptr<CkeyBoardInput>& getKeyBoardInput() const { return m_pKeyBoardController; }
-	
+
 	private:
 		GLFWwindow* __createWindow();
 		bool __initParametersFromXML();
@@ -68,7 +68,6 @@ namespace openGLTask
 		bool m_UseCoreProfile;
 		int m_ScreenMaxWidth;
 		int m_ScreenMaxHeight;
-		glm::vec3 m_LightDirection;
 		GLFWwindow* m_pWindow = nullptr;
 		std::shared_ptr<CVertexBuffer> m_pVertexBuffer = nullptr;
 		std::shared_ptr<CShader> m_pShader = nullptr;
