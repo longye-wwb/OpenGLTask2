@@ -4,9 +4,10 @@
 namespace openGLTask 
 {
 	CDirectionalLight::CDirectionalLight()
-	:m_LightColor(glm::vec3(1.0f, 1.0f, 1.0f)),m_LightDirection(0.0f,0.0f,- 1.0f),m_LightPosition(0.0f,0.0f,0.0f)
+	:m_LightColor(glm::vec3(1.0f, 1.0f, 1.0f)),m_LightDirection(0.0f, 0.0f, -1.0f),m_LightPosition(0.0f,0.0f,0.0f)
 	{
 	}
+
 	glm::vec3 CDirectionalLight::rotateDirectionalLight(const float& vSpeed)
 	{
 		float AngularSpeed = glm::radians(vSpeed);

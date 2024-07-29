@@ -16,7 +16,7 @@ namespace openGLTask
 	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"), m_LightDirection(glm::vec3(0.0f, 0.0f, 1.0f)),
 		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
 		m_pKeyBoardController(nullptr), m_PixelVertShaderPath("../shaders/vertPerPixelShading.glsl"), m_PixelFragShaderPath("../shaders/fragPerPixelShading.glsl"),
-		m_VertexVertShaderPath("../shaders/vertPerVertexShading.glsl"),m_VertexFragShaderPath("../shaders/fragPerVertexShading.glsl"),
+		m_VertexVertShaderPath("../shaders/vertPerVertexShading.glsl"),m_VertexFragShaderPath("../shaders/fragPerVertexShading.glsl"), m_GLTFPath("../models/dragon.gltf"),
 		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
 	{
 	}
@@ -41,6 +41,7 @@ namespace openGLTask
 		std::optional<std::string> PixelFragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> VtexVertShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_vs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> VtexFragShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_fs|SHADER_SOURCE_FILE").value();
+		std::optional<std::string> GLTFPath = Config.getAttribute<std::string>("GLTFPath").value();
 
 		std::optional<std::tuple<double, double, double>> CamPos = Config.getAttribute<std::tuple<double, double, double>>("CameraPos");
 		std::optional<std::tuple<double, double, double>> CameraFront = Config.getAttribute<std::tuple<double, double, double>>("CameraFront");
@@ -54,6 +55,7 @@ namespace openGLTask
 		__checkAndSetWinName(WinName);
 		__checkAndSetProfile(UseCoreProfile);
 		__checkAndSetShaderGLSL(PixelVertShaderPath, PixelFragShaderPath);
+		__checkAndSetGLTFPath(GLTFPath);
 		__checkAndBindCamera(CamPos, CameraFront, CameraUp);
 		__checkAndSetLightDirection(LightDirection);
 		return true;
@@ -113,10 +115,11 @@ namespace openGLTask
 		__setAndBindVertices();
 		__setAndBindKeyInputController();
 
+		glEnable(GL_DEPTH_TEST);
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			__setAndBindShader();
 			m_pShader->use();
@@ -126,6 +129,10 @@ namespace openGLTask
 			if (!m_pKeyBoardController->getEState())
 			{
 				m_pShader->setVec3("uDirection", vFunCallback(m_pDirectionalLight));
+			}
+			else
+			{
+				m_pShader->setVec3("uDirection", m_LightDirection);
 			}
 			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
@@ -278,7 +285,7 @@ namespace openGLTask
 					assert(BufferViewPos.byteLength == BufferViewNor.byteLength);
 
 					const int Vec3Byte = 12;
-					for (size_t i = BufferViewPos.byteOffset, k = BufferViewNor.byteOffset;
+					for (std::size_t i = BufferViewPos.byteOffset, k = BufferViewNor.byteOffset;
 						(i < BufferViewPos.byteOffset + BufferViewPos.byteLength && k < BufferViewNor.byteOffset + BufferViewNor.byteLength);
 						i += Vec3Byte, k += Vec3Byte) 
 					{
@@ -296,8 +303,7 @@ namespace openGLTask
 	void CRenderWindow::__setAndBindVertices()
 	{
 		tinygltf::Model GLTFModel;
-		const std::string FilePath = "../models/dragon.gltf";
-		__loadGLTF(FilePath, GLTFModel);
+		__loadGLTF(m_GLTFPath, GLTFModel);
 		
 		std::vector<float> Vertices;
 		std::vector<unsigned int> Indices;
@@ -439,21 +445,27 @@ namespace openGLTask
 
 	void CRenderWindow::__checkAndSetShaderGLSL(std::optional<std::string> vPixelVertShaderPath, std::optional<std::string> vPixelFragShaderPath)
 	{
-		if (vPixelVertShaderPath.has_value() && vPixelFragShaderPath.has_value())
+		if (vPixelVertShaderPath.has_value() && vPixelFragShaderPath.has_value() && std::filesystem::exists(vPixelVertShaderPath.value()) && std::filesystem::exists(vPixelFragShaderPath.value()))
 		{
-			if (std::filesystem::exists(vPixelVertShaderPath.value()) && std::filesystem::exists(vPixelFragShaderPath.value()))
-			{
-				m_PixelVertShaderPath = vPixelVertShaderPath.value();
-				m_PixelFragShaderPath = vPixelFragShaderPath.value();
-			}
-			else
-			{
-				HIVE_LOG_ERROR("ShaderGLSL paht is invalid, use default path.");
-			}
+			m_PixelVertShaderPath = vPixelVertShaderPath.value();
+			m_PixelFragShaderPath = vPixelFragShaderPath.value();
 		}
 		else
 		{
-			HIVE_LOG_ERROR("ShaderGLSL paht is invalid, use default path.");
+			HIVE_LOG_ERROR("ShaderGLSL path is invalid, use default path.");
+		}
+		return;
+	}
+
+	void CRenderWindow::__checkAndSetGLTFPath(std::optional<std::string> vGLTFPath)
+	{
+		if (vGLTFPath.has_value() && std::filesystem::exists(vGLTFPath.value()) )
+		{
+			m_GLTFPath = vGLTFPath.value();
+		}
+		else
+		{
+			HIVE_LOG_ERROR("GLTF path is invalid, use default path.");
 		}
 		return;
 	}

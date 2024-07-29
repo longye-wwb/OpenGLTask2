@@ -29,6 +29,7 @@ namespace openGLTask
 		_defineAttribute("CameraFront", hiveConfig::EConfigDataType::ATTRIBUTE_VEC3F);
 		_defineAttribute("CameraUp", hiveConfig::EConfigDataType::ATTRIBUTE_VEC3F);
 		_defineAttribute("LightDirection", hiveConfig::EConfigDataType::ATTRIBUTE_VEC3F);
+		_defineAttribute("GLTFPATH", hiveConfig::EConfigDataType::ATTRIBUTE_STRING);
 	}
 
 	void CRenderConfiguration::__loadDefaultConfigV()
@@ -45,6 +46,7 @@ namespace openGLTask
 		setAttribute("CameraFront",std::tuple<double, double, double>(0.0f, 0.0f, -1.0f));
 		setAttribute("CameraUp",std::tuple<double, double, double>(0.0f, 1.0f, 0.0f));
 		setAttribute("LightDirection",std::tuple<double, double, double>(0.0f, 0.0f, -1.0f));
+		setAttribute("GLTFPATH",std::string("../models/dragon.gltf"));
 	}
 }
 

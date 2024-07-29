@@ -23,7 +23,7 @@ namespace openGLTask
 	}
 
 	CVertexBuffer::CVertexBuffer(const std::vector<float>& vVertices,const std::vector<unsigned int>& vIndices, const std::vector<int>& vVertexIndexLayout, GLenum vDrawMode, GLenum vUsage)
-	:m_VAO(0), m_VBO(0), m_EBO(0), m_DrawMode(vDrawMode),m_VerticesCount(vVertices.size())
+	:m_VAO(0), m_VBO(0), m_EBO(0), m_DrawMode(vDrawMode),m_VerticesCount(vIndices.size())
 	{
 		glGenVertexArrays(1, &m_VAO);
 		glGenBuffers(1, &m_VBO);
@@ -34,7 +34,7 @@ namespace openGLTask
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * vIndices.size(), vIndices.data(), vUsage);
 		__configVertex(vVertexIndexLayout);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 
@@ -58,7 +58,7 @@ namespace openGLTask
 		int TempCount = 0;
 		for (int i = 0; i < vVertexIndexLayout.size(); ++i)
 		{
-			glVertexAttribPointer(i, vVertexIndexLayout[i], GL_FLOAT, GL_FALSE, VertexCount * sizeof(float), (void*)(TempCount* sizeof(float)));
+			glVertexAttribPointer(i, vVertexIndexLayout[i], GL_FLOAT, GL_FALSE, VertexCount * sizeof(float), (void*)(TempCount * sizeof(float)));
 			glEnableVertexAttribArray(i);
 			TempCount += vVertexIndexLayout[i];
 		}

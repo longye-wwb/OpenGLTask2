@@ -47,6 +47,7 @@ namespace openGLTask
 		void __checkAndSetWinName(const std::optional<std::string>& vWinName);
 		void __checkAndSetProfile(std::optional<bool> vUseCoreProfile);
 		void __checkAndSetShaderGLSL(std::optional<std::string> vVertShaderPath, std::optional<std::string> vFragShaderPath);
+		void __checkAndSetGLTFPath(std::optional<std::string> vGLTFPath);
 		bool __isOpenGLVersionValid(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
 		void __setWidth(int vWidth) { m_Width = vWidth; }
 		void __setHeight(int vHeight) { m_Height = vHeight; }
@@ -63,6 +64,7 @@ namespace openGLTask
 		std::string m_PixelFragShaderPath;
 		std::string m_VertexVertShaderPath;
 		std::string m_VertexFragShaderPath;
+		std::string m_GLTFPath;
 		bool m_UseCoreProfile;
 		int m_ScreenMaxWidth;
 		int m_ScreenMaxHeight;

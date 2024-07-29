@@ -38,6 +38,7 @@
 </RENDER_ALGORITHM>
 
 <CameraPos> 0.0 0.0 30.0 </CameraPos>
-<CameraFront> 0.0 0.0 -100.0 </CameraFront>
-<CameraUp> 0.0 100.0 0.0 </CameraUp>
-<LightDirection> 0.0 0.0 -100.0 </LightDirection>
+<CameraFront> 0.0 0.0 -1.0 </CameraFront>
+<CameraUp> 0.0 1.0 0.0 </CameraUp>
+<LightDirection> 0.0 0.0 -10.0 </LightDirection>
+<GLTFPATH> ../models/dragon.gltf </GLTFPATH>
