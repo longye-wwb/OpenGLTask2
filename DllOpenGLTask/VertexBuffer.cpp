@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 #include <numeric>
-
+#include "pch.h"
 #define VEC3 3
 #define STRIDE 9
 
@@ -49,7 +49,10 @@ namespace openGLTask
 	{
 		glBindVertexArray(m_VAO);
 		if (m_EBO != 0) glDrawElements(m_DrawMode, m_VerticesCount, GL_UNSIGNED_INT, 0);
-		else glDrawArrays(m_DrawMode, 0, m_VerticesCount);
+		else 
+		{
+			glDrawArrays(m_DrawMode, 0, m_VerticesCount);
+		}
 	}
 
 	void CVertexBuffer::__configVertex(const std::vector<int>& vVertexIndexLayout)

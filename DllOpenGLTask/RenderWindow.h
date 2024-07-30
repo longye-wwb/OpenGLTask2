@@ -8,6 +8,7 @@
 #include "VertexBuffer.h"
 #include <tiny_gltf.h>
 #include "keyBoardInput.h"
+#include "Texture2D.h"
 
 namespace openGLTask 
 {
@@ -39,6 +40,7 @@ namespace openGLTask
 		void __setAndBindVertices();
 		void __setAndBindShader();
 		void __setAndBindKeyInputController();
+		void __setAndBindTextureController();
 		void __checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp);
 		void __checkAndSetLightDirection(std::optional<std::tuple<double, double, double>> vLightDirection);
 		void __checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight);
@@ -52,7 +54,7 @@ namespace openGLTask
 		void __setWidth(int vWidth) { m_Width = vWidth; }
 		void __setHeight(int vHeight) { m_Height = vHeight; }
 		void __setAndGetScreenSize();
-
+		void __RenderQuad();
 		int m_MajorVersion;
 		int m_MinorVersion;
 		int m_Width;
@@ -74,5 +76,6 @@ namespace openGLTask
 		std::shared_ptr<CCamera> m_pCamera = nullptr;
 		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
 		std::shared_ptr<CkeyBoardInput> m_pKeyBoardController = nullptr;
+		std::shared_ptr<CTexture2D> m_pTextureController = nullptr;
 	};
 }
