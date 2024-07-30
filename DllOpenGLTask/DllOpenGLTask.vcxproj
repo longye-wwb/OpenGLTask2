@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CShaderConfig.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="dllFile.h" />
     <ClInclude Include="framework.h" />
@@ -158,9 +159,11 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="simpleMaterial.h" />
     <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="WindowConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CShaderConfig.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="keyBoardInput.cpp" />
@@ -175,6 +178,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="simpleMaterial.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="WindowConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

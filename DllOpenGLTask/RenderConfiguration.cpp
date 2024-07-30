@@ -5,6 +5,7 @@ namespace openGLTask
 	CRenderConfiguration::CRenderConfiguration() {
 		_overwriteProductSig("MY_CONFIG");
 		__defineAttributesV();
+		__loadDefaultConfigV();
 	}
 
 	void CRenderConfiguration::__defineAttributesV()

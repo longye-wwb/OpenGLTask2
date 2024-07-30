@@ -13,12 +13,32 @@
 
 namespace openGLTask 
 {
-	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_Width(800), m_Height(600), m_WinName("GLFW_Window"),
-		m_PosX(10), m_PosY(10), m_UseCoreProfile(false), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
+	CRenderWindow::CRenderWindow() : m_MajorVersion(3), m_MinorVersion(3), m_UseCoreProfile(false),
+		m_pWindowConfig(nullptr), m_pWindow(nullptr), m_pVertexBuffer(nullptr), m_pShader(nullptr), m_pCamera(nullptr), m_pDirectionalLight(nullptr),
 		m_pKeyBoardController(nullptr), m_PixelVertShaderPath("../shaders/vertPerPixelShading.glsl"), m_PixelFragShaderPath("../shaders/fragPerPixelShading.glsl"),
-		m_VertexVertShaderPath("../shaders/vertPerVertexShading.glsl"),m_VertexFragShaderPath("../shaders/fragPerVertexShading.glsl"), m_GLTFPath("../models/dragon.gltf"),
-		m_ScreenMaxWidth(1920), m_ScreenMaxHeight(1080)
+		m_VertexVertShaderPath("../shaders/vertPerVertexShading.glsl"),m_VertexFragShaderPath("../shaders/fragPerVertexShading.glsl"), m_GLTFPath("../models/dragon.gltf")
 	{
+	}
+
+	bool CRenderWindow::__readXML(CRenderConfiguration& vConfig, const std::string& vXMLName)
+	{
+		CRenderConfiguration Config;
+		auto Status = hiveConfig::hiveParseConfig(vXMLName, hiveConfig::EConfigType::XML, &Config);
+		if (Status == hiveConfig::EParseResult::SUCCEED)
+		{
+			vConfig = Config;
+			return true;
+		}
+		else if (Status == hiveConfig::EParseResult::SKIP_SOME_ITEMS)
+		{
+			vConfig = Config;
+			HIVE_LOG_WARNING("Warning : Some items in XML are not set correctly!");
+			return true;
+		}
+		else if (Status == hiveConfig::EParseResult::FAIL)
+		{
+			return false;
+		}
 	}
 
 	bool CRenderWindow::__initParametersFromXML()
@@ -29,14 +49,13 @@ namespace openGLTask
 			return false;
 		}
 
-		std::optional<int> Width = Config.getAttribute<int>("Width");
-		std::optional<int> Height = Config.getAttribute<int>("Height");
-		std::optional<int> PosX = Config.getAttribute<int>("PosX");
-		std::optional<int> PosY = Config.getAttribute<int>("PosY");
+		m_pWindowConfig = std::make_shared<CWindowConfig>();
+		m_pWindowConfig->parseConfig(Config);
+
 		std::optional<int> MajorVersion = Config.getAttribute<int>("MajorVersion");
 		std::optional<int> MinorVersion = Config.getAttribute<int>("MinorVersion");
-		std::optional<std::string> WinName = Config.getAttribute<std::string>("WinName");
 		std::optional<bool> UseCoreProfile = Config.getAttribute<bool>("UseCoreProfile");
+
 		std::optional<std::string> PixelVertShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_vs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> PixelFragShaderPath = Config.getAttribute<std::string>("shader_perpixel_shading_fs|SHADER_SOURCE_FILE").value();
 		std::optional<std::string> VtexVertShaderPath = Config.getAttribute<std::string>("shader_pervertex_shading_vs|SHADER_SOURCE_FILE").value();
@@ -48,11 +67,7 @@ namespace openGLTask
 		std::optional<std::tuple<double, double, double>> CameraUp = Config.getAttribute<std::tuple<double, double, double>>("CameraUp");
 		std::optional<std::tuple<double, double, double>> LightDirection = Config.getAttribute<std::tuple<double, double, double>>("LightDirection");
 		
-		__setAndGetScreenSize();
-		__checkAndSetWindowSize(Width, Height);
-		__checkAndSetWindowPos(PosX, PosY);
 		__checkAndSetOpenGLVersion(MajorVersion, MinorVersion);
-		__checkAndSetWinName(WinName);
 		__checkAndSetProfile(UseCoreProfile);
 		__checkAndSetShaderGLSL(PixelVertShaderPath, PixelFragShaderPath);
 		__checkAndSetGLTFPath(GLTFPath);
@@ -78,7 +93,7 @@ namespace openGLTask
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, getMinorVersion());
 		glfwWindowHint(GLFW_OPENGL_PROFILE, getUseCoreProfile() ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
 
-		m_pWindow = glfwCreateWindow(getWidth(), getHeight(), getWinName().c_str(), nullptr, nullptr);
+		m_pWindow = glfwCreateWindow(m_pWindowConfig->getWidth(), m_pWindowConfig->getHeight(), m_pWindowConfig->getWinName().c_str(), nullptr, nullptr);
 		if (m_pWindow == nullptr)
 		{
 			HIVE_LOG_ERROR("Failed to create GLFW window");
@@ -87,7 +102,7 @@ namespace openGLTask
 		}
 
 		glfwMakeContextCurrent(m_pWindow);
-		glfwSetWindowPos(m_pWindow, getPosX(), getPosY());
+		glfwSetWindowPos(m_pWindow, m_pWindowConfig->getPosX(), m_pWindowConfig->getPosY());
 		glfwSetFramebufferSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height) {
 			glViewport(0, 0, width, height); });
 		glfwSetWindowUserPointer(m_pWindow, this);
@@ -134,7 +149,7 @@ namespace openGLTask
 			{
 				m_pShader->setVec3("uDirection", m_pDirectionalLight->getDirection());
 			}
-			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)getWidth() / (float)getHeight(), 0.1f, 100.0f);
+			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)m_pWindowConfig->getWidth() / (float)m_pWindowConfig->getHeight(), 0.1f, 100.0f);
 			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
 			m_pShader->setMat4("uProjection", ProjectionMat);
 			m_pShader->setMat4("uView", ViewMat);
@@ -150,27 +165,6 @@ namespace openGLTask
 		return ;
 	}
 
-	bool CRenderWindow::__readXML(CRenderConfiguration& vConfig,const std::string& vXMLName)
-	{
-		CRenderConfiguration Config;
-		auto Status = hiveConfig::hiveParseConfig(vXMLName, hiveConfig::EConfigType::XML, &Config);
-		if (Status == hiveConfig::EParseResult::SUCCEED) 
-		{
-			vConfig = Config;
-			return true;
-		}
-		else if (Status == hiveConfig::EParseResult::SKIP_SOME_ITEMS)
-		{
-			vConfig = Config;
-			HIVE_LOG_WARNING("Warning : Some items in XML are not set correctly!");
-			return true;
-		}
-		else if (Status == hiveConfig::EParseResult::FAIL)
-		{
-			return false;
-		}
-	}
-	
 	bool CRenderWindow::__loadGLTF(const std::string& vFilename, tinygltf::Model& vModelGLTF)
 	{
 		tinygltf::TinyGLTF Loader;
@@ -358,51 +352,6 @@ namespace openGLTask
 		}
 	}
 
-	void CRenderWindow::__checkAndSetWindowSize(std::optional<int> vWidth, std::optional<int> vHeight)
-	{
-		
-		if (vWidth.value() >= 0 && vHeight.value() >= 0 && 
-			vWidth.value() <= m_ScreenMaxWidth && vHeight.value() <= m_ScreenMaxHeight)
-		{
-			m_Width = vWidth.value();
-			m_Height = vHeight.value();
-		}
-		else if (vWidth.value() > m_ScreenMaxWidth || vHeight.value() > m_ScreenMaxHeight)
-		{
-			if (vWidth.value() > m_ScreenMaxWidth)
-			{
-				m_Width = m_ScreenMaxWidth;
-				HIVE_LOG_ERROR("Width is too big,use max value");
-			}
-			if ( vHeight.value() > m_ScreenMaxHeight)
-			{
-				m_Height = m_ScreenMaxHeight;
-				HIVE_LOG_ERROR("Height is too big,use max value");
-			}
-		}
-		else
-		{
-			HIVE_LOG_ERROR("Width or Height is invalid,use default value");
-		}
-		return;
-	}
-
-	void CRenderWindow::__checkAndSetWindowPos(std::optional<int> vPosX, std::optional<int> vPosY)
-	{
-
-		if ( vPosX.value() >= 0 && vPosY.value() >= 0 
-			&& vPosX.value() <= m_ScreenMaxWidth && vPosY.value() <= m_ScreenMaxHeight)
-		{
-			m_PosX = vPosX.value();
-			m_PosY = vPosY.value();
-		}
-		else
-		{
-			HIVE_LOG_ERROR("PosX or PosY is invalid,use default value");
-		}
-		return;
-	}
-
 	void CRenderWindow::__checkAndSetOpenGLVersion(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion)
 	{
 		if (__isOpenGLVersionValid(vMajorVersion, vMinorVersion))
@@ -415,19 +364,6 @@ namespace openGLTask
 			HIVE_LOG_ERROR("OpenGLVersion is invalid,use default value");
 		}
 		
-	}
-
-	void CRenderWindow::__checkAndSetWinName(const std::optional<std::string>& vWinName)
-	{
-		if (vWinName.has_value())
-		{
-			m_WinName = vWinName.value();
-		}
-		else
-		{
-			HIVE_LOG_ERROR("WindowName is invalid,use default value");
-		}
-		return;
 	}
 
 	void CRenderWindow::__checkAndSetProfile(std::optional<bool> vUseCoreProfile)
@@ -527,19 +463,5 @@ namespace openGLTask
 		default:
 			return false;
 		}
-	}
-
-	void CRenderWindow::__setAndGetScreenSize() 
-	{
-		glfwInit();
-		GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
-		if (pMonitor == nullptr) 
-		{
-			HIVE_LOG_WARNING("Can't Get Monitor");
-			return;
-		}
-		const GLFWvidmode* pMode = glfwGetVideoMode(pMonitor);
-		m_ScreenMaxWidth = pMode->width;
-		m_ScreenMaxHeight = pMode->height;
 	}
 }

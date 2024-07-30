@@ -57,6 +57,12 @@
     <ClInclude Include="keyBoardInput.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WindowConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CShaderConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -87,6 +93,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="keyBoardInput.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowConfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CShaderConfig.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
