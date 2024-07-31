@@ -10,6 +10,7 @@ namespace openGLTask
 
 	void CRenderConfiguration::__defineAttributesV()
 	{
+		_defineAttribute("Config", hiveConfig::EConfigDataType::ATTRIBUTE_ANON_SUBCONFIG);
 		_defineAttribute("Width", hiveConfig::EConfigDataType::ATTRIBUTE_INT);
 		_defineAttribute("Height", hiveConfig::EConfigDataType::ATTRIBUTE_INT);
 		_defineAttribute("MajorVersion", hiveConfig::EConfigDataType::ATTRIBUTE_INT);

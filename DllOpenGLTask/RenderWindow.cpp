@@ -46,8 +46,12 @@ namespace openGLTask
 		CRenderConfiguration Config;
 		if (!CRenderWindow::__readXML(Config, "../XML/config.xml")) 
 		{
+			std::cout << "false" << std::endl;
 			return false;
 		}
+		/*const hiveConfig::CHiveConfig* pSubconfig = Config.getSubconfigAt(0);
+		
+		std::cout << pSubconfig->getAttribute<int>("Width").value();*/
 
 		m_pWindowConfig = std::make_shared<CWindowConfig>();
 		m_pWindowConfig->parseConfig(Config);
