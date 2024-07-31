@@ -1,44 +1,46 @@
-<Width> 888 </Width>
-<Height>600</Height>
-<MajorVersion> 3 </MajorVersion>
-<MinorVersion> 3 </MinorVersion>
-<PosX> 100 </PosX>
-<PosY> 100 </PosY>
-<WinName> hello world </WinName>
-<UseCoreProfile> true </UseCoreProfile>
+<?xml version="1.0" encoding="utf-8"?>
 
-<SHADER> shader_perpixel_shading_vs
-  <SHADER_SOURCE_FILE> ../shaders/vertPerPixelShading.glsl </SHADER_SOURCE_FILE>
-</SHADER>
+  <Width> 888 </Width>
+  <Height>600</Height>
+  <MajorVersion> 3 </MajorVersion>
+  <MinorVersion> 3 </MinorVersion>
+  <PosX> 100 </PosX>
+  <PosY> 100 </PosY>
+  <WinName> hello world </WinName>
+  <UseCoreProfile> true </UseCoreProfile>
 
-<SHADER> shader_perpixel_shading_fs
-  <SHADER_SOURCE_FILE> ../shaders/fragPerPixelShading.glsl </SHADER_SOURCE_FILE>
-</SHADER>
+  <SHADER> shader_perpixel_shading_vs
+    <SHADER_SOURCE_FILE> ../shaders/vertPerPixelShading.glsl </SHADER_SOURCE_FILE>
+  </SHADER>
 
-<RENDER_ALGORITHM> PerpixelShading
-  <RENDER_PASS> perpixel_shading
-    <VERTEX_SHADER> shader_perpixel_shading_vs </VERTEX_SHADER>
-    <FRAGMENT_SHADER> shader_perpixel_shading_fs </FRAGMENT_SHADER>
-  </RENDER_PASS>
-</RENDER_ALGORITHM>
+  <SHADER> shader_perpixel_shading_fs
+    <SHADER_SOURCE_FILE> ../shaders/fragPerPixelShading.glsl </SHADER_SOURCE_FILE>
+  </SHADER>
 
-<SHADER> shader_pervertex_shading_vs
-  <SHADER_SOURCE_FILE> ../shaders/vertPerVertexShading.glsl </SHADER_SOURCE_FILE>
-</SHADER>
+  <RENDER_ALGORITHM> PerpixelShading
+    <RENDER_PASS> perpixel_shading
+      <VERTEX_SHADER> shader_perpixel_shading_vs </VERTEX_SHADER>
+      <FRAGMENT_SHADER> shader_perpixel_shading_fs </FRAGMENT_SHADER>
+    </RENDER_PASS>
+  </RENDER_ALGORITHM>
 
-<SHADER> shader_pervertex_shading_fs
-  <SHADER_SOURCE_FILE> ../shaders/fragPerVertexShading.glsl </SHADER_SOURCE_FILE>
-</SHADER>
+  <SHADER> shader_pervertex_shading_vs
+    <SHADER_SOURCE_FILE> ../shaders/vertPerVertexShading.glsl </SHADER_SOURCE_FILE>
+  </SHADER>
 
-<RENDER_ALGORITHM> PerVertexShading
-  <RENDER_PASS> pervertex_shading
-    <VERTEX_SHADER> shader_pervertex_shading_vs </VERTEX_SHADER>
-    <FRAGMENT_SHADER> shader_pervertex_shading_fs </FRAGMENT_SHADER>
-  </RENDER_PASS>
-</RENDER_ALGORITHM>
+  <SHADER> shader_pervertex_shading_fs
+    <SHADER_SOURCE_FILE> ../shaders/fragPerVertexShading.glsl </SHADER_SOURCE_FILE>
+  </SHADER>
 
-<CameraPos> 0.0 0.0 30.0 </CameraPos>
-<CameraFront> 0.0 0.0 -1.0 </CameraFront>
-<CameraUp> 0.0 1.0 0.0 </CameraUp>
-<LightDirection> 0.0 0.0 -10.0 </LightDirection>
-<GLTFPATH> ../models/dragon.gltf </GLTFPATH>
+  <RENDER_ALGORITHM> PerVertexShading
+    <RENDER_PASS> pervertex_shading
+      <VERTEX_SHADER> shader_pervertex_shading_vs </VERTEX_SHADER>
+      <FRAGMENT_SHADER> shader_pervertex_shading_fs </FRAGMENT_SHADER>
+    </RENDER_PASS>
+  </RENDER_ALGORITHM>
+
+  <CameraPos> 0.0 0.0 30.0 </CameraPos>
+  <CameraFront> 0.0 0.0 -1.0 </CameraFront>
+  <CameraUp> 0.0 1.0 0.0 </CameraUp>
+  <LightDirection> 0.0 0.0 -10.0 </LightDirection>
+  <GLTFPATH> ../models/dragon.gltf </GLTFPATH>

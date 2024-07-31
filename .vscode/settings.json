@@ -53,6 +53,15 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "thread": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "strstream": "cpp",
+        "condition_variable": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "source_location": "cpp",
+        "mutex": "cpp",
+        "shared_mutex": "cpp",
+        "cinttypes": "cpp",
+        "valarray": "cpp"
     }
 }

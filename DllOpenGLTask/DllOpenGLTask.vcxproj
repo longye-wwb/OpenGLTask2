@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DeferredPipeline.h" />
+    <ClInclude Include="CShaderConfig.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="dllFile.h" />
     <ClInclude Include="FrameBuffer.h" />
@@ -162,10 +163,12 @@
     <ClInclude Include="simpleMaterial.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="WindowConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DeferredPipeline.cpp" />
+    <ClCompile Include="CShaderConfig.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
@@ -182,6 +185,7 @@
     <ClCompile Include="simpleMaterial.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="WindowConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
