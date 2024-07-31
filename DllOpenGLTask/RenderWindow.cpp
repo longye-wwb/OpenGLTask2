@@ -121,11 +121,11 @@ namespace openGLTask
 		CShader GBufferShader = CShader("../shaders/gbuffer.vs","../shaders/gbuffer.fs");
 		CShader LightShader = CShader("../shaders/light.vs","../shaders/light.fs");
 
-		// - Colors
+		//// - Colors
 		const GLuint NR_LIGHTS = 32;
 		std::vector<glm::vec3> lightPositions;
 		std::vector<glm::vec3> lightColors;
-		GLuint gBuffer;
+		
 		srand(13);
 		for (GLuint i = 0; i < NR_LIGHTS; i++)
 		{
@@ -140,19 +140,20 @@ namespace openGLTask
 			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
 			lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 		}
-		// positions all containers
-		glm::vec3 cubePositions[] = {
-			glm::vec3(0.0f,  0.0f,  0.0f),
-			glm::vec3(2.0f,  5.0f, -15.0f),
-			glm::vec3(-1.5f, -2.2f, -2.5f),
-			glm::vec3(-3.8f, -2.0f, -12.3f),
-			glm::vec3(2.4f, -0.4f, -3.5f),
-			glm::vec3(-1.7f,  3.0f, -7.5f),
-			glm::vec3(1.3f, -2.0f, -2.5f),
-			glm::vec3(1.5f,  2.0f, -2.5f),
-			glm::vec3(1.5f,  0.2f, -1.5f),
-			glm::vec3(-1.3f,  1.0f, -1.5f)
-		};
+		//// positions all containers
+		//glm::vec3 cubePositions[] = {
+		//	glm::vec3(0.0f,  0.0f,  0.0f),
+		//	glm::vec3(2.0f,  5.0f, -15.0f),
+		//	glm::vec3(-1.5f, -2.2f, -2.5f),
+		//	glm::vec3(-3.8f, -2.0f, -12.3f),
+		//	glm::vec3(2.4f, -0.4f, -3.5f),
+		//	glm::vec3(-1.7f,  3.0f, -7.5f),
+		//	glm::vec3(1.3f, -2.0f, -2.5f),
+		//	glm::vec3(1.5f,  2.0f, -2.5f),
+		//	glm::vec3(1.5f,  0.2f, -1.5f),
+		//	glm::vec3(-1.3f,  1.0f, -1.5f)
+		//};
+		GLuint gBuffer;
 		glGenFramebuffers(1, &gBuffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 		GLuint gPosition, gNormal;
@@ -194,20 +195,23 @@ namespace openGLTask
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glm::mat4 projection = glm::perspective(45.0f, (GLfloat)getWidth() / (GLfloat)getHeight(), 0.1f, 100.0f);
 			glm::mat4 view = m_pCamera->getViewMatrix();
-			glm::mat4 model;
+			glm::mat4 model= glm::mat4(1.0f);
+			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 			GBufferShader.use();
 			GBufferShader.setMat4("projection",projection);
 			GBufferShader.setMat4("view", view);
-			for (unsigned int i = 0; i < 10; i++)
-			{
-				// calculate the model matrix for each object and pass it to shader before drawing
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, cubePositions[i]);
-				float angle = 20.0f * i;
-				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-				GBufferShader.setMat4("model", model);
-				m_pVertexBuffer->draw();
-			}
+			GBufferShader.setMat4("model", model);
+			m_pVertexBuffer->draw();
+			//for (unsigned int i = 0; i < 10; i++)
+			//{
+			//	// calculate the model matrix for each object and pass it to shader before drawing
+			//	glm::mat4 model = glm::mat4(1.0f);
+			//	model = glm::translate(model, cubePositions[i]);
+			//	float angle = 20.0f * i;
+			//	model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			//	GBufferShader.setMat4("model", model);
+			//	m_pVertexBuffer->draw();
+			//}
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glDisable(GL_DEPTH_TEST);
@@ -394,57 +398,57 @@ namespace openGLTask
 
 	void CRenderWindow::__setAndBindVertices()
 	{
-	/*	tinygltf::Model GLTFModel;
-		__loadGLTF(m_GLTFPath, GLTFModel);*/
-		
-		std::vector<float> Vertices= {
-			// positions          // normals          
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		tinygltf::Model GLTFModel;
+		__loadGLTF(m_GLTFPath, GLTFModel);
+		std::vector<float> Vertices;
+		//std::vector<float> Vertices= {
+		//	// positions          // normals          
+		//	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		//	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		//	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		//	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		//	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		//	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		//	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		//	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		//	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		//	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		//	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		//	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		//	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		//	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		//	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		//	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		//	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		//	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-			 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		//	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		//	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		//	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		//	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		//	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		//	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		//	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		//	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		//	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		//	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		//	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		//	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-		};
+		//	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		//	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		//	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		//	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		//	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		//	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+		//};
 
-		/*std::vector<unsigned int> Indices;
-		__createVerticeAndIndice(GLTFModel, Vertices, Indices);*/
-		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, std::vector<int>{3,3}, GL_TRIANGLES, GL_STATIC_DRAW);
+		std::vector<unsigned int> Indices;
+		__createVerticeAndIndice(GLTFModel, Vertices, Indices);
+		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices ,std::vector<int>{3,3}, GL_TRIANGLES, GL_STATIC_DRAW);
 	}
 
 	void CRenderWindow::__setAndBindShader()

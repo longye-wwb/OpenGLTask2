@@ -9,6 +9,7 @@
 #include <tiny_gltf.h>
 #include "keyBoardInput.h"
 #include "Texture2D.h"
+#include <GLFW/glfw3.h>
 
 namespace openGLTask 
 {

@@ -145,14 +145,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DeferredPipeline.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="dllFile.h" />
+    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="keyBoardInput.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Pipline.h" />
     <ClInclude Include="RenderConfiguration.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
@@ -162,8 +165,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DeferredPipeline.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="keyBoardInput.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

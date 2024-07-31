@@ -40,4 +40,19 @@ namespace openGLTask {
 
 		return textureID;
 	}
+
+	void CTexture2D::bind() const
+	{
+		glBindTexture(GL_TEXTURE_2D, m_TextureID);
+	}
+	void CTexture2D::setParameters(GLenum vName, GLint vValue)
+	{
+		glTexParameteri(GL_TEXTURE_2D, vName, vValue);
+	}
+
+	void CTexture2D::setParameters(GLenum vName, const GLfloat* vValue)
+	{
+		glTexParameterfv(GL_TEXTURE_2D, vName, vValue);
+	}
+
 }
