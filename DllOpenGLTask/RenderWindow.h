@@ -44,6 +44,7 @@ namespace openGLTask
 		void __checkAndSetShaderGLSL(std::optional<std::string> vVertShaderPath, std::optional<std::string> vFragShaderPath);
 		void __checkAndSetGLTFPath(std::optional<std::string> vGLTFPath);
 		bool __isOpenGLVersionValid(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
+		void __RenderQuad();
 
 		int m_MajorVersion;
 		int m_MinorVersion;
