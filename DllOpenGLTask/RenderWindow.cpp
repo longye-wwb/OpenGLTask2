@@ -4,6 +4,7 @@
 #include <optional>
 #include <filesystem>
 #include <tiny_gltf.h>
+#include <stb_image.h>
 
 #define TINYGLTF_MODE_DEFAULT -1 
 #define TINYGLTF_MODE_POINT 0
@@ -133,34 +134,125 @@ namespace openGLTask
 
 		__setAndBindVertices();
 		__setAndBindKeyInputController();
+		__setAndBindTextureController();
 
 		glEnable(GL_DEPTH_TEST);
+		CShader GBufferShader = CShader("../shaders/gbuffer.vs","../shaders/gbuffer.fs");
+		CShader LightShader = CShader("../shaders/light.vs","../shaders/light.fs");
+
+		// - Colors
+		const GLuint NR_LIGHTS = 32;
+		std::vector<glm::vec3> lightPositions;
+		std::vector<glm::vec3> lightColors;
+		GLuint gBuffer;
+		srand(13);
+		for (GLuint i = 0; i < NR_LIGHTS; i++)
+		{
+			// Calculate slightly random offsets
+			GLfloat xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+			GLfloat yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
+			GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+			lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+			// Also calculate random color
+			GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+			GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+			lightColors.push_back(glm::vec3(rColor, gColor, bColor));
+		}
+		// positions all containers
+		glm::vec3 cubePositions[] = {
+			glm::vec3(0.0f,  0.0f,  0.0f),
+			glm::vec3(2.0f,  5.0f, -15.0f),
+			glm::vec3(-1.5f, -2.2f, -2.5f),
+			glm::vec3(-3.8f, -2.0f, -12.3f),
+			glm::vec3(2.4f, -0.4f, -3.5f),
+			glm::vec3(-1.7f,  3.0f, -7.5f),
+			glm::vec3(1.3f, -2.0f, -2.5f),
+			glm::vec3(1.5f,  2.0f, -2.5f),
+			glm::vec3(1.5f,  0.2f, -1.5f),
+			glm::vec3(-1.3f,  1.0f, -1.5f)
+		};
+		glGenFramebuffers(1, &gBuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+		GLuint gPosition, gNormal;
+		// - Position color buffer
+		glGenTextures(1, &gPosition);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, getWidth(), getHeight(), 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+		// - Normal color buffer
+		glGenTextures(1, &gNormal);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, getWidth(), getHeight(), 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+		
+		GLuint attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(2, attachments);
+
+		GLuint objDepth;
+		glGenTextures(1, &objDepth);
+		glBindTexture(GL_TEXTURE_2D, objDepth);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, getWidth(), getHeight(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, objDepth, 0);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Framebuffer not complete!" << std::endl;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 		while (!glfwWindowShouldClose(m_pWindow))
 		{
-			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+			glEnable(GL_DEPTH_TEST);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			__setAndBindShader();
-			m_pShader->use();
-			m_pShader->setVec3("uViewPos", m_pCamera->getWorldPos());
-			m_pShader->setFloat("uShininess", 32.0f);
-			m_pShader->setFloat("uAmbientStrength", 0.1f);
-			if (!m_pKeyBoardController->getEState())
+			glm::mat4 projection = glm::perspective(45.0f, (GLfloat)getWidth() / (GLfloat)getHeight(), 0.1f, 100.0f);
+			glm::mat4 view = m_pCamera->getViewMatrix();
+			glm::mat4 model;
+			GBufferShader.use();
+			GBufferShader.setMat4("projection",projection);
+			GBufferShader.setMat4("view", view);
+			for (unsigned int i = 0; i < 10; i++)
 			{
-				m_pShader->setVec3("uDirection", vFunCallback(m_pDirectionalLight));
+				// calculate the model matrix for each object and pass it to shader before drawing
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, cubePositions[i]);
+				float angle = 20.0f * i;
+				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+				GBufferShader.setMat4("model", model);
+				m_pVertexBuffer->draw();
 			}
-			else
-			{
-				m_pShader->setVec3("uDirection", m_pDirectionalLight->getDirection());
-			}
-			glm::mat4 ProjectionMat = glm::perspective(glm::radians(45.0f), (float)m_pWindowConfig->getWidth() / (float)m_pWindowConfig->getHeight(), 0.1f, 100.0f);
-			glm::mat4 ViewMat = m_pCamera->getViewMatrix();
-			m_pShader->setMat4("uProjection", ProjectionMat);
-			m_pShader->setMat4("uView", ViewMat);
-			glm::mat4 Model = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-			m_pShader->setMat4("uModel", Model);
 
-			m_pVertexBuffer->draw();
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glDisable(GL_DEPTH_TEST);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, gPosition);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, gNormal);
+			// Also send light relevant uniforms
+			LightShader.use();
+			LightShader.setInt("gPosition", 0);
+			LightShader.setInt("gNormal", 1);
+			for (GLuint i = 0; i < lightPositions.size(); i++)
+			{
+				LightShader.setVec3(("lights[" + std::to_string(i) + "].Position").c_str(), lightPositions[i][0], lightPositions[i][1], lightPositions[i][2]);
+				LightShader.setVec3(("lights[" + std::to_string(i) + "].Color").c_str(), lightColors[i][0], lightColors[i][1], lightColors[i][2]);
+				// Update attenuation parameters and calculate radius
+				const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
+				const GLfloat linear = 0.7;
+				const GLfloat quadratic = 1.8;
+				LightShader.setFloat(("lights[" + std::to_string(i) + "].Linear").c_str(), linear);
+				LightShader.setFloat(("lights[" + std::to_string(i) + "].Quadratic").c_str(), quadratic);
+			}
+			LightShader.setMat4("viewPos", view);
+			__RenderQuad();
+			//m_pVertexBuffer->draw();
 			glfwSwapBuffers(m_pWindow);
 			glfwPollEvents();
 		}
@@ -300,13 +392,57 @@ namespace openGLTask
 
 	void CRenderWindow::__setAndBindVertices()
 	{
-		tinygltf::Model GLTFModel;
-		__loadGLTF(m_GLTFPath, GLTFModel);
+	/*	tinygltf::Model GLTFModel;
+		__loadGLTF(m_GLTFPath, GLTFModel);*/
 		
-		std::vector<float> Vertices;
-		std::vector<unsigned int> Indices;
-		__createVerticeAndIndice(GLTFModel, Vertices, Indices);
-		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices, std::vector<int>{3, 3}, GL_TRIANGLES, GL_STATIC_DRAW);
+		std::vector<float> Vertices= {
+			// positions          // normals          
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+		};
+
+		/*std::vector<unsigned int> Indices;
+		__createVerticeAndIndice(GLTFModel, Vertices, Indices);*/
+		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, std::vector<int>{3,3}, GL_TRIANGLES, GL_STATIC_DRAW);
 	}
 
 	void CRenderWindow::__setAndBindShader()
@@ -324,6 +460,10 @@ namespace openGLTask
 	void CRenderWindow::__setAndBindKeyInputController()
 	{
 		m_pKeyBoardController = std::make_shared<CkeyBoardInput>();
+	}
+	void CRenderWindow::__setAndBindTextureController()
+	{
+		m_pTextureController = std::make_shared<CTexture2D>();
 	}
 
 	void CRenderWindow::__checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp)
@@ -467,5 +607,33 @@ namespace openGLTask
 		default:
 			return false;
 		}
+	}
+	GLuint quadVAO = 0;
+	GLuint quadVBO;
+	void CRenderWindow::__RenderQuad()
+	{
+		if (quadVAO == 0)
+		{
+			GLfloat quadVertices[] = {
+				// Positions        // Texture Coords
+				-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+				1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+				1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			};
+			// Setup plane VAO
+			glGenVertexArrays(1, &quadVAO);
+			glGenBuffers(1, &quadVBO);
+			glBindVertexArray(quadVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		}
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindVertexArray(0);
 	}
 }

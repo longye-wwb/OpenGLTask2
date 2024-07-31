@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "VertexBuffer.h"
 #include "keyBoardInput.h"
+#include "Texture2D.h"
 #include <tiny_gltf.h>
 
 namespace openGLTask 
@@ -35,6 +36,7 @@ namespace openGLTask
 		void __setAndBindVertices();
 		void __setAndBindShader();
 		void __setAndBindKeyInputController();
+		void __setAndBindTextureController();
 		void __checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp);
 		void __checkAndSetLightDirection(std::optional<std::tuple<double, double, double>> vLightDirection);
 		void __checkAndSetOpenGLVersion(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
@@ -59,5 +61,6 @@ namespace openGLTask
 		std::shared_ptr<CCamera> m_pCamera = nullptr;
 		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
 		std::shared_ptr<CkeyBoardInput> m_pKeyBoardController = nullptr;
+		std::shared_ptr<CTexture2D> m_pTextureController = nullptr;
 	};
 }
