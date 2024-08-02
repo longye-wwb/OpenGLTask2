@@ -1,58 +1,37 @@
 #include "Texture2D.h"
 #include "pch.h"
-namespace openGLTask {
-	CTexture2D::CTexture2D()
+
+namespace openGLTask 
+{
+	CTexture2D::CTexture2D(int vWidth, int vHeight, GLenum vInternalFormat, GLenum vFormat, GLenum vDataType)
+		:m_TextureID(0), m_InternalFormat(vInternalFormat), m_Format(vFormat), m_Type(vDataType), m_Width(0), m_Height(0)
 	{
+		glGenTextures(1, &m_TextureID);
+		updateTexture2D(vWidth, vHeight, nullptr);
 	}
-	unsigned int CTexture2D::loadTexture(char const* path)
+	CTexture2D::~CTexture2D()
 	{
-		unsigned int textureID;
-		glGenTextures(1, &textureID);
-
-		int width, height, nrComponents;
-		unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-		if (data)
-		{
-			GLenum format;
-			if (nrComponents == 1)
-				format = GL_RED;
-			else if (nrComponents == 3)
-				format = GL_RGB;
-			else if (nrComponents == 4)
-				format = GL_RGBA;
-
-			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-			stbi_image_free(data);
-		}
-		else
-		{
-			std::cout << "Texture failed to load at path: " << path << std::endl;
-			stbi_image_free(data);
-		}
-
-		return textureID;
+		glDeleteTextures(1, &m_TextureID);
 	}
-
 	void CTexture2D::bind() const
 	{
 		glBindTexture(GL_TEXTURE_2D, m_TextureID);
 	}
-	void CTexture2D::setParameters(GLenum vName, GLint vValue)
+	void CTexture2D::setTextureParameter(GLenum vName, GLint vValue)
 	{
 		glTexParameteri(GL_TEXTURE_2D, vName, vValue);
 	}
 
-	void CTexture2D::setParameters(GLenum vName, const GLfloat* vValue)
+	void CTexture2D::setTextureParameter(GLenum vName, const GLfloat* vValue)
 	{
 		glTexParameterfv(GL_TEXTURE_2D, vName, vValue);
 	}
-
+	void CTexture2D::updateTexture2D(int vWidth, int vHeight, const GLvoid* vPixels)
+	{
+		m_Width = vWidth;
+		m_Height = vHeight;
+		bind();
+		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, vWidth, vHeight, 0, m_Format, m_Type, vPixels);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
 }

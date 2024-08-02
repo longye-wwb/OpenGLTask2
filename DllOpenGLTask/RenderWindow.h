@@ -11,6 +11,8 @@
 #include "Texture2D.h"
 #include <GLFW/glfw3.h>
 #include <tiny_gltf.h>
+#include "GameObject.h"
+#include "FrameBuffer.h"
 
 namespace openGLTask 
 {
@@ -24,6 +26,9 @@ namespace openGLTask
 		int getMajorVersion() { return m_MajorVersion; }
 		int getMinorVersion() { return m_MinorVersion; }
 		bool getUseCoreProfile() { return m_UseCoreProfile; }
+		const auto& getRootGameObject() { return m_RootGameObject; }
+		const auto& getFrameBuffer() { return m_FrameBuffer; }
+		const std::shared_ptr<CCamera>& getCamera() const { return m_pCamera; }
 		const std::shared_ptr<CkeyBoardInput>& getKeyBoardInput() const { return m_pKeyBoardController; }
 
 	private:
@@ -37,7 +42,7 @@ namespace openGLTask
 		void __setAndBindVertices();
 		void __setAndBindShader();
 		void __setAndBindKeyInputController();
-		void __setAndBindTextureController();
+		//void __setAndBindTextureController();
 		void __checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp);
 		void __checkAndSetLightDirection(std::optional<std::tuple<double, double, double>> vLightDirection);
 		void __checkAndSetOpenGLVersion(std::optional<int> vMajorVersion, std::optional<int> vMinorVersion);
@@ -64,5 +69,7 @@ namespace openGLTask
 		std::shared_ptr<CDirectionalLight> m_pDirectionalLight = nullptr;
 		std::shared_ptr<CkeyBoardInput> m_pKeyBoardController = nullptr;
 		std::shared_ptr<CTexture2D> m_pTextureController = nullptr;
+		std::shared_ptr<CGameObject> m_RootGameObject = nullptr;
+		std::shared_ptr<CFrameBuffer> m_FrameBuffer = nullptr;
 	};
 }

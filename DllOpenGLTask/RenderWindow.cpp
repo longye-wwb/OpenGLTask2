@@ -134,7 +134,7 @@ namespace openGLTask
 
 		__setAndBindVertices();
 		__setAndBindKeyInputController();
-		__setAndBindTextureController();
+		//__setAndBindTextureController();
 
 		glEnable(GL_DEPTH_TEST);
 		CShader GBufferShader = CShader("../shaders/gbuffer.vs","../shaders/gbuffer.fs");
@@ -465,10 +465,11 @@ namespace openGLTask
 	{
 		m_pKeyBoardController = std::make_shared<CkeyBoardInput>();
 	}
-	void CRenderWindow::__setAndBindTextureController()
-	{
-		m_pTextureController = std::make_shared<CTexture2D>();
-	}
+
+	//void CRenderWindow::__setAndBindTextureController()
+	//{
+	//	m_pTextureController = std::make_shared<CTexture2D>();
+	//}
 
 	void CRenderWindow::__checkAndBindCamera(std::optional<std::tuple<double, double, double>> vCameraPos, std::optional<std::tuple<double, double, double>> vCameraFront, std::optional<std::tuple<double, double, double>> vCameraUp)
 	{

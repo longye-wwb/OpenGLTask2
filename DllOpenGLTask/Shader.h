@@ -6,9 +6,6 @@ namespace openGLTask
 {
     class CShader
     {
-    private:
-        void __checkCompileErrors(GLuint vShader, std::string vType);
-
     public:
         unsigned int m_ID;
 
@@ -20,5 +17,9 @@ namespace openGLTask
         void setVec3(const std::string& vName, const glm::vec3& vValue) const;
         void setVec3(const std::string& vName, float vPosx, float vPosy, float vPosz) const;
         void setMat4(const std::string& vName, const glm::mat4& vMat) const;
+    private:
+        void __checkCompileErrors(GLuint vShader, std::string vType);
+
     };
+
 }

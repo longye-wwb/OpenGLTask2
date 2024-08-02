@@ -15,5 +15,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "HiveConfig.h"
 #include "HiveLogger.h"
+#include <memory>
 
 #endif 
