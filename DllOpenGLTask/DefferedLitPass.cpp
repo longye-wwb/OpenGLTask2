@@ -45,10 +45,13 @@ namespace openGLTask
 		pDeferredGeoFB->getAttachment(GL_COLOR_ATTACHMENT0)->bind();
 		glActiveTexture(GL_TEXTURE1);
 		pDeferredGeoFB->getAttachment(GL_COLOR_ATTACHMENT1)->bind();
+		glActiveTexture(GL_TEXTURE2);
+		pDeferredGeoFB->getAttachment(GL_DEPTH_ATTACHMENT)->bind();
 
 		m_pShaderProgram->use();
 		m_pShaderProgram->setInt("gPosition", 0);
 		m_pShaderProgram->setInt("gNormal", 1);
+		m_pShaderProgram->setInt("gDepthTex", 2);
 
 		m_pShaderProgram->setVec3("uViewPos", pCamera->getWorldPos());
 		m_pShaderProgram->setVec3("uLightDir", pDirLight->_LightDir);

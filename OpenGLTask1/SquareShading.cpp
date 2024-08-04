@@ -99,8 +99,9 @@ int main()
 	pPlaneGameObject->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	const auto& pRootGameObject= std::make_shared<openGLTask::CGameObject>();
 	pRootGameObject->addChild(pPlaneGameObject);
-	//const auto& pDragonGameObject = openGLTask::CModelLoader::loadGltfFile("../models/dragon.gltf");
-	//pRootGameObject->addChild(pDragonGameObject);
+	const auto& pDragonGameObject = openGLTask::CModelLoader::loadGltfFile("../models/dragon.gltf");
+	pRootGameObject->addChild(pDragonGameObject);
+	pDragonGameObject->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
 
 	const auto& pCamera = std::make_shared<openGLTask::CCamera>((float)Exe.getWidth() / (float)Exe.getHeight());
 	const auto& pCameraController = std::make_shared<openGLTask::CFPSController>();
@@ -111,18 +112,18 @@ int main()
 	pDirLight->_LightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	pDirLight->_LightIntensity = 10.0f;
 	pDirLight->_LightPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	//pDirLight->_LightDir = glm::vec3(0.0f, 0.0f, 0.0f) - pDirLight->_LightPos;
-	pDirLight->_LightDir = glm::vec3(1.0f, 0.0f, 0.0f);
+	pDirLight->_LightDir = glm::vec3(0.0f,-1.0f, -1.0f) - pDirLight->_LightPos;
+	//pDirLight->_LightDir = glm::vec3(0.0f, -1.0f, -1.0f);
 
-	const auto& pPointLight = std::make_shared<openGLTask::SPointLight>();
-	pPointLight->_LightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	pPointLight->_LightIntensity = 1000.0f;
-	pPointLight->_LightPos = glm::vec3(0.0f, 0.0f, 5.0f);
+	//const auto& pPointLight = std::make_shared<openGLTask::SPointLight>();
+	//pPointLight->_LightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	//pPointLight->_LightIntensity = 1000.0f;
+	//pPointLight->_LightPos = glm::vec3(0.0f, 0.0f, 5.0f);
 
 	g_Scene = std::make_shared<openGLTask::CScene>();
 	g_Scene->setCamera(pCamera);
 	g_Scene->setDirectionalLight(pDirLight);
-	g_Scene->setPointLight(pPointLight);
+	//g_Scene->setPointLight(pPointLight);
 	g_Scene->setRootNode(pRootGameObject);
 
 	setRenderPipeline(Exe.getWidth(), Exe.getHeight());
@@ -134,6 +135,7 @@ int main()
 		const float CurrTime = static_cast<float>(glfwGetTime());
 		const float DeltaTime = CurrTime - LastTime;
 		LastTime = CurrTime;
+		pDragonGameObject->setRotation(glm::vec3(1.0f, 1.0f, 1.0f) * CurrTime * 5.0f);
 		pCameraController->update(DeltaTime);
 		g_RenderPipeline->render(g_Scene);
 		Exe.swapBuffers();

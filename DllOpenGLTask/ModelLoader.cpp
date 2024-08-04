@@ -112,8 +112,8 @@ namespace openGLTask
 
 					createIndiceBufferData(Indices, bufferViewInd, bufferInd, indiceComponentType);
 					HIVE_LOG_INFO("indice.size : {}", Indices.size());
-
 					assert(Indices.size() == vGLTFModel.accessors[primitive.indices].count);
+
 					const tinygltf::BufferView& bufferViewPos = vGLTFModel.bufferViews[vGLTFModel.accessors[primitive.attributes.at("POSITION")].bufferView];
 					const tinygltf::Buffer& bufferPos = vGLTFModel.buffers[bufferViewPos.buffer];
 					const tinygltf::BufferView& bufferViewNor = vGLTFModel.bufferViews[vGLTFModel.accessors[primitive.attributes.at("NORMAL")].bufferView];
@@ -148,6 +148,6 @@ namespace openGLTask
 		const auto& pParentGameObject = std::make_shared<CGameObject>();
 		if (!loadGLTF(vFileName, GLTFModel)) return nullptr;
 		createCGameObject(GLTFModel, pParentGameObject);
-		return std::shared_ptr<CGameObject>();
+		return pParentGameObject;
 	}
 }

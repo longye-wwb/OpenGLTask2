@@ -3,7 +3,7 @@
 
 namespace openGLTask
 {
-	CCamera::CCamera(float vAspect, float vNearHeight, float vNear, float vFar) :m_Position(0.0f, 0.0f, 0.0f),
+	CCamera::CCamera(float vAspect, float vNearHeight, float vNear, float vFar) :m_Position(0.0f, 1.0f, 10.0f),
 		m_Front(0.0f, 0.0f, -1.0f), m_Up(0.0f, 1.0f, 0.0f), m_Right(1.0f, 0.0f, 0.0f), m_WorldUp(0.0f, 1.0f, 0.0f),
 		m_ViewMatrix{}, m_ProjectionMatrix{}, m_SolidColor(0.2f, 0.3f, 0.3f, 1.0f), m_Aspect(vAspect), m_Near(vNear), m_Far(vFar)
 	{
