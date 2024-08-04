@@ -2,14 +2,18 @@
 #include "pch.h"
 namespace openGLTask {
 	CFrameBuffer::CFrameBuffer()
-		:m_FrameBufferID(0)
+		:m_FrameBufferID(0), m_Width(0), m_Height(0), m_TexturesMap{}, m_RenderBuffersMap{}
 	{
-		glGenFramebuffers(1, &m_FrameBufferID);
 	}
 
 	CFrameBuffer::~CFrameBuffer()
 	{
 		glDeleteFramebuffers(1, &m_FrameBufferID);
+	}
+
+	void CFrameBuffer::create()
+	{
+		glGenFramebuffers(1, &m_FrameBufferID);
 	}
 	void CFrameBuffer::bind(GLenum vTarget) const
 	{
@@ -20,6 +24,7 @@ namespace openGLTask {
 	{
 		glBindFramebuffer(vTarget, 0);
 	}
+
 	void CFrameBuffer::setAttachment(GLenum vAttachmentType, const std::shared_ptr<CTexture2D>& vTexture2D, GLint vTextureLevel)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, vAttachmentType, GL_TEXTURE_2D, vTexture2D->getID(), vTextureLevel);
@@ -27,6 +32,7 @@ namespace openGLTask {
 		m_Width = vTexture2D->getWidth();
 		m_Height = vTexture2D->getHeight();
 	}
+
 	void CFrameBuffer::setAttachment(GLenum vAttachmentType, const std::shared_ptr<CRenderBuffer>& vRenderBuffer)
 	{
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, vAttachmentType, GL_RENDERBUFFER, vRenderBuffer->getID());
@@ -34,14 +40,17 @@ namespace openGLTask {
 		m_Width = vRenderBuffer->getWidth();
 		m_Height = vRenderBuffer->getHeight();
 	}
+
 	const std::shared_ptr<CTexture2D>& CFrameBuffer::getAttachment(GLenum vAttachmentType)
 	{
 		return m_TexturesMap[vAttachmentType];
 	}
+
 	void CFrameBuffer::drawAttachments(const std::vector<GLenum>& vAttachmentsType)
 	{
 		glDrawBuffers((GLsizei)vAttachmentsType.size(), vAttachmentsType.data());
 	}
+
 	void CFrameBuffer::updateFrameBuffer(int vWidth, int vHeight)
 	{
 		m_Width = vWidth;
@@ -61,5 +70,17 @@ namespace openGLTask {
 			HIVE_LOG_ERROR("Framebuffer is not complete!");
 		}
 		return IsComplete;
+	}
+	const std::shared_ptr<CFrameBuffer>& CFrameBuffer::getDefaultFrameBuffer()
+	{
+		static std::shared_ptr<CFrameBuffer> pDefaultFrameBuffer = std::make_shared<CFrameBuffer>();
+		return pDefaultFrameBuffer;
+	}
+
+	void CFrameBuffer::initDefaultFrameBuffer(int vWidth, int vHeight, GLuint vFrameBufferID)
+	{
+		getDefaultFrameBuffer()->m_Width = vWidth;
+		getDefaultFrameBuffer()->m_Height = vHeight;
+		getDefaultFrameBuffer()->m_FrameBufferID = vFrameBufferID;
 	}
 }

@@ -1,12 +1,14 @@
+#pragma once
 #include <vector>
 #include "Transform.h"
 #include <memory>
 #include <functional>
-#include "Mesh.h"
+#include "dllFile.h"
 
 namespace openGLTask
 {
-	class CGameObject
+	class CMesh;
+	class OPENGLTASK_API CGameObject
 	{
 	public: 
 		CGameObject();

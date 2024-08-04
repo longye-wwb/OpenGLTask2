@@ -1,9 +1,10 @@
 #pragma once
 #include <glad/glad.h>
+#include  "dllFile.h"
 
 namespace openGLTask 
 {
-	class CTexture2D
+	class OPENGLTASK_API CTexture2D
 	{
 	public:
 		CTexture2D(int vWidth, int vHeight, GLenum vInternalFormat, GLenum vFormat, GLenum vDataType);

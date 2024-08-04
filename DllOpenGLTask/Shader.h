@@ -1,10 +1,11 @@
+#pragma once
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <string>
+#include "dllFile.h"
 
 namespace openGLTask
 {
-    class CShader
+    class OPENGLTASK_API CShader
     {
     public:
         unsigned int m_ID;

@@ -42,13 +42,7 @@
     <ClInclude Include="Light.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Material.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleMaterial.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="InputController.h">
@@ -60,10 +54,7 @@
     <ClInclude Include="Texture2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DeferredPipeline.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Pipline.h">
+    <ClInclude Include="DefferedGeoPass.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="FrameBuffer.h">
@@ -90,6 +81,30 @@
     <ClInclude Include="Mesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DefferedLitPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GlfwWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraController.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FpsController.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -113,19 +128,13 @@
     <ClCompile Include="Camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="simpleMaterial.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="keyBoardInput.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Texture2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DeferredPipeline.cpp">
+    <ClCompile Include="DefferedGeoPass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FrameBuffer.cpp">
@@ -149,7 +158,25 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
+    <ClCompile Include="Scene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DefferedLitPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GlfwWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FpsController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

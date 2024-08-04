@@ -1,4 +1,4 @@
-#include <glm/gtc/matrix_transform.hpp>
+#include "pch.h"
 #include "Camera.h"
 
 namespace openGLTask
@@ -13,31 +13,12 @@ namespace openGLTask
 		__updateProjectionMatrix();
 	}
 
-	void CCamera::setFront(const glm::vec3& vFront)
-	{
-		m_Front = vFront;
-		__updateCameraVectors();
-		__updateViewMatrix();
-	}
-
-	void CCamera::setWorldUp(const glm::vec3& vWorldUp)
-	{
-		m_WorldUp = vWorldUp;
-		__updateCameraVectors();
-		__updateViewMatrix();
-	}
-
-	void CCamera::setWorldPos(const glm::vec3& vPosition)
-	{
-		m_Position = vPosition;
-		__updateViewMatrix();
-	}
-
 	void CCamera::setAspect(float vAspect)
 	{
 		m_Aspect = vAspect;
 		__updateProjectionMatrix();
 	}
+
 
 	void CCamera::setNear(float vNear)
 	{
@@ -55,6 +36,26 @@ namespace openGLTask
 	{
 		m_NearHeight = vNearHeight;
 		__updateProjectionMatrix();
+	}
+
+	void CCamera::setFront(const glm::vec3& vFront)
+	{
+		m_Front = vFront;
+		__updateCameraVectors();
+		__updateViewMatrix();
+	}
+
+	void CCamera::setWorldPos(const glm::vec3& vPosition)
+	{
+		m_Position = vPosition;
+		__updateViewMatrix();
+	}
+
+	void CCamera::setWorldUp(const glm::vec3& vWorldUp)
+	{
+		m_WorldUp = vWorldUp;
+		__updateCameraVectors();
+		__updateViewMatrix();
 	}
 
 	void CCamera::setViewport(int vWidth, int vHeight)

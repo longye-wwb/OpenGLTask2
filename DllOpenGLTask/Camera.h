@@ -1,9 +1,10 @@
+#pragma once
 #include <glm/glm.hpp>
-
+#include  "dllFile.h"
 //TODO:增加相机类型 如正交相机
 namespace openGLTask
 {
-	class CCamera
+	class OPENGLTASK_API CCamera
 	{
 	public:
 		CCamera(float vAspect = 1.0f, float vNearHeight = 1.0f, float vNear = 0.1f, float vFar = 100.0f);

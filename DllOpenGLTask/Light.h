@@ -1,17 +1,26 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "dllFile.h"
 
 namespace openGLTask 
 {
-	class CLight
+	struct OPENGLTASK_API SLight
 	{
-	public:
-		virtual glm::vec3 getLightColor() const = 0;
-		virtual glm::vec3 getPosition() const = 0;
-		virtual glm::vec3 getDirection() const = 0;
-		virtual void setLightColor(const glm::vec3& vColor) = 0;
-		virtual void setPosition(const glm::vec3& vPosition) = 0;
-		virtual void setDirection(const glm::vec3& vDirection) = 0;
+		glm::vec3 _LightColor;
+		float _LightIntensity;
+		glm::vec3 _LightPos;
+	};
+
+	struct OPENGLTASK_API SDirectionalLight : SLight
+	{
+		glm::vec3 _LightDir;
+	};
+
+	struct OPENGLTASK_API SPointLight : SLight
+	{
+		float _Near = 0.1f; // shadow frustum
+		float _Far = 100.0f; // shadow frustum
+		float _Radius;
 	};
 }
 

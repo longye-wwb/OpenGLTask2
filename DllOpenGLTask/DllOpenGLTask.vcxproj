@@ -145,26 +145,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="DeferredPipeline.h" />
+    <ClInclude Include="CameraController.h" />
+    <ClInclude Include="DefferedGeoPass.h" />
     <ClInclude Include="CShaderConfig.h" />
-    <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="DefferedLitPass.h" />
     <ClInclude Include="dllFile.h" />
+    <ClInclude Include="FpsController.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GlfwWindow.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="keyBoardInput.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Pipline.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="RenderBuffer.h" />
     <ClInclude Include="RenderConfiguration.h" />
+    <ClInclude Include="RenderPass.h" />
+    <ClInclude Include="RenderPipeline.h" />
     <ClInclude Include="RenderWindow.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="simpleMaterial.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />
@@ -172,14 +177,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DeferredPipeline.cpp" />
+    <ClCompile Include="DefferedGeoPass.cpp" />
     <ClCompile Include="CShaderConfig.cpp" />
-    <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="DefferedLitPass.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="FpsController.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GlfwWindow.cpp" />
     <ClCompile Include="keyBoardInput.cpp" />
-    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -189,9 +196,11 @@
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="RenderBuffer.cpp" />
     <ClCompile Include="RenderConfiguration.cpp" />
+    <ClCompile Include="RenderPass.cpp" />
+    <ClCompile Include="RenderPipeline.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="simpleMaterial.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
