@@ -15,5 +15,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "HiveConfig.h"
 #include "HiveLogger.h"
-
+#include <memory>
+#include <glm/gtc/quaternion.hpp>
+#include <tiny_gltf.h>
+#include <iostream>
 #endif 

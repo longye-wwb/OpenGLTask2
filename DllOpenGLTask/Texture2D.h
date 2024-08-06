@@ -1,22 +1,28 @@
 #pragma once
-#include <stb_image.h>
-#include "dllFile.h"
 #include <glad/glad.h>
-namespace openGLTask {
+#include  "dllFile.h"
+
+namespace openGLTask 
+{
 	class OPENGLTASK_API CTexture2D
 	{
 	public:
-		CTexture2D();
-		unsigned int loadTexture(char const* path);
-		// Inherited via CTexture
+		CTexture2D(int vWidth, int vHeight, GLenum vInternalFormat, GLenum vFormat, GLenum vDataType);
+		~CTexture2D();
+
 		GLuint getID() const { return m_TextureID; }
 		void bind() const ;
 		int getWidth() const { return m_Width; }
 		int getHeight() const { return m_Height; }
-		static void setParameters(GLenum vName, GLint vValue);
-		static void setParameters(GLenum vName, const GLfloat* vValue);
+		static void setTextureParameter(GLenum vName, GLint vValue);
+		static void setTextureParameter(GLenum vName, const GLfloat* vValue);
+		void updateTexture2D(int vWidth, int vHeight, const GLvoid* vPixels);
+
 	private:
 		GLuint m_TextureID;
+		GLenum m_InternalFormat;
+		GLenum m_Format;
+		GLenum m_Type;
 		int m_Width, m_Height;
 	};
 }
