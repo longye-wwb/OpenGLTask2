@@ -159,19 +159,7 @@ namespace openGLTask
 			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
 			lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 		}
-		//// positions all containers
-		//glm::vec3 cubePositions[] = {
-		//	glm::vec3(0.0f,  0.0f,  0.0f),
-		//	glm::vec3(2.0f,  5.0f, -15.0f),
-		//	glm::vec3(-1.5f, -2.2f, -2.5f),
-		//	glm::vec3(-3.8f, -2.0f, -12.3f),
-		//	glm::vec3(2.4f, -0.4f, -3.5f),
-		//	glm::vec3(-1.7f,  3.0f, -7.5f),
-		//	glm::vec3(1.3f, -2.0f, -2.5f),
-		//	glm::vec3(1.5f,  2.0f, -2.5f),
-		//	glm::vec3(1.5f,  0.2f, -1.5f),
-		//	glm::vec3(-1.3f,  1.0f, -1.5f)
-		//};
+
 		GLuint gBuffer;
 		glGenFramebuffers(1, &gBuffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -221,16 +209,6 @@ namespace openGLTask
 			GBufferShader.setMat4("view", view);
 			GBufferShader.setMat4("model", model);
 			m_pVertexBuffer->draw();
-			//for (unsigned int i = 0; i < 10; i++)
-			//{
-			//	// calculate the model matrix for each object and pass it to shader before drawing
-			//	glm::mat4 model = glm::mat4(1.0f);
-			//	model = glm::translate(model, cubePositions[i]);
-			//	float angle = 20.0f * i;
-			//	model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			//	GBufferShader.setMat4("model", model);
-			//	m_pVertexBuffer->draw();
-			//}
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glDisable(GL_DEPTH_TEST);
@@ -399,54 +377,9 @@ namespace openGLTask
 		tinygltf::Model GLTFModel;
 		__loadGLTF(m_GLTFPath, GLTFModel);
 		std::vector<float> Vertices;
-		//std::vector<float> Vertices= {
-		//	// positions          // normals          
-		//	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		//	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		//	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		//	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		//	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		//	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-		//	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		//	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		//	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		//	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		//	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		//	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-		//	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		//	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		//	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		//	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		//	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		//	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-		//	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		//	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		//	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		//	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		//	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		//	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-		//	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		//	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		//	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		//	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		//	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		//	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-		//	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		//	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		//	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		//	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		//	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		//	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-		//};
-
 		std::vector<unsigned int> Indices;
 		__createVerticeAndIndice(GLTFModel, Vertices, Indices);
-		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices ,std::vector<int>{3,3}, GL_TRIANGLES, GL_STATIC_DRAW);
+		m_pVertexBuffer = std::make_shared<CVertexBuffer>(Vertices, Indices ,std::vector<int>{3,3},                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       , GL_STATIC_DRAW);
 	}
 
 	void CRenderWindow::__setAndBindShader()
@@ -465,6 +398,7 @@ namespace openGLTask
 	{
 		m_pKeyBoardController = std::make_shared<CkeyBoardInput>();
 	}
+	
 	void CRenderWindow::__setAndBindTextureController()
 	{
 		m_pTextureController = std::make_shared<CTexture2D>();
@@ -612,10 +546,11 @@ namespace openGLTask
 			return false;
 		}
 	}
-	GLuint quadVAO = 0;
-	GLuint quadVBO;
+	
 	void CRenderWindow::__RenderQuad()
 	{
+		GLuint quadVAO = 0;
+		GLuint quadVBO;
 		if (quadVAO == 0)
 		{
 			GLfloat quadVertices[] = {
